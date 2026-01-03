@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Stream Layout - Coding Scene v2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Color Palette */
+            --bg-main: #0d1117;
+            --bg-panel: #161b22;
+            --bg-hover: #21262d;
+            --border: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-purple: #8957e5;
+            --accent-yellow: #d29922;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: var(--bg-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1600px 320px;
+            grid-template-rows: 900px 180px;
+            width: 1920px;
+            height: 1080px;
+        }
+
+        /* 화면 캡처 영역 (사용자 OBS 처리) */
+        .screen-capture {
+            grid-column: 1;
+            grid-row: 1;
+            background: rgba(13, 17, 23, 0.3);
+            border: 2px dashed var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .screen-capture-label {
+            font-size: 24px;
+            color: var(--text-secondary);
+        }
+
+        .screen-capture-size {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--accent-blue);
+        }
+
+        .screen-capture-note {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* 우측 패널 */
+        .right-panel {
+            grid-column: 2;
+            grid-row: 1;
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 현재 이슈 섹션 */
+        .current-issue {
+            padding: 20px 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-hover);
+        }
+
+        .section-header {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .issue-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-purple);
+            margin-bottom: 4px;
+        }
+
+        .issue-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .issue-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .meta-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .meta-value {
+            font-family: monospace;
+            color: var(--text-primary);
+        }
+
+        /* 진행 단계 섹션 */
+        .progress-section {
+            flex: 1;
+            padding: 20px 16px;
+            overflow-y: auto;
+        }
+
+        .progress-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 12px;
+            background: var(--bg-main);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-item.completed {
+            opacity: 0.6;
+        }
+
+        .progress-item.current {
+            border-color: var(--accent-purple);
+            background: rgba(137, 87, 229, 0.1);
+        }
+
+        .progress-item.pending {
+            opacity: 0.5;
+        }
+
+        .progress-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .progress-icon.done {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .progress-icon.active {
+            background: var(--accent-purple);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        .progress-icon.waiting {
+            background: var(--bg-hover);
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .progress-content {
+            flex: 1;
+        }
+
+        .progress-title {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .progress-detail {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* TDD 사이클 섹션 */
+        .tdd-section {
+            padding: 20px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-hover);
+        }
+
+        .tdd-cycle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tdd-phase {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            opacity: 0.3;
+            transition: all 0.3s;
+        }
+
+        .tdd-phase.active {
+            opacity: 1;
+            transform: scale(1.15);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .tdd-red { background: var(--accent-red); color: white; }
+        .tdd-green { background: var(--accent-green); color: white; }
+        .tdd-refactor { background: var(--accent-blue); color: white; }
+
+        .tdd-arrow {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .tdd-info {
+            text-align: center;
+        }
+
+        .tdd-test-count {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .tdd-test-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* 하단 타임라인 바 */
+        .bottom-bar {
+            grid-column: 1;
+            grid-row: 2;
+            background: var(--bg-panel);
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 16px 24px;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .timeline-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* LIVE 뱃지 */
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-red);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 14px;
+            animation: livePulse 2s infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .session-time {
+            font-size: 32px;
+            font-weight: 600;
+            font-family: monospace;
+            color: var(--text-primary);
+        }
+
+        .session-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-left: 8px;
+        }
+
+        /* 타임라인 */
+        .timeline-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .timeline-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--bg-hover);
+            border-radius: 2px;
+            transform: translateY(-50%);
+        }
+
+        .timeline-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 75%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 2px;
+        }
+
+        .timeline-events {
+            position: relative;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .timeline-event {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translateX(-50%);
+        }
+
+        .event-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid var(--bg-panel);
+            margin-bottom: 8px;
+            z-index: 1;
+        }
+
+        .event-dot.start { background: var(--accent-green); }
+        .event-dot.commit { background: var(--accent-blue); }
+        .event-dot.test { background: var(--accent-yellow); }
+        .event-dot.pr { background: var(--accent-purple); }
+        .event-dot.now {
+            background: var(--accent-red);
+            width: 20px;
+            height: 20px;
+            animation: nowPulse 1.5s infinite;
+        }
+
+        @keyframes nowPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(248, 81, 73, 0); }
+        }
+
+        .event-info {
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .event-time {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .event-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        .event-detail {
+            font-size: 9px;
+            color: var(--text-secondary);
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 얼굴 캠 영역 */
+        .webcam-area {
+            grid-column: 2;
+            grid-row: 2;
+            background: var(--bg-main);
+            border-left: 1px solid var(--border);
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .webcam-placeholder {
+            width: 288px;
+            height: 162px;
+            background: var(--bg-panel);
+            border: 3px solid var(--accent-purple);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .webcam-icon {
+            font-size: 36px;
+            color: var(--text-secondary);
+        }
+
+        .webcam-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        /* 스크롤바 스타일 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 화면 캡처 영역 (사용자 OBS 처리) -->
+        <div class="screen-capture">
+            <div class="screen-capture-label">Screen Capture Area</div>
+            <div class="screen-capture-size">1600 x 900</div>
+            <div class="screen-capture-note">16:9 - OBS Window Capture</div>
+        </div>
+
+        <!-- 우측 패널 - 이슈 중심 -->
+        <div class="right-panel">
+            <!-- 현재 이슈 -->
+            <div class="current-issue">
+                <div class="section-header">Current Issue</div>
+                <div class="issue-number">#42</div>
+                <div class="issue-title">OBS 오버레이 시스템 구현</div>
+                <div class="issue-meta">
+                    <div class="meta-item">
+                        <span class="meta-icon">P</span>
+                        <span class="meta-value">tft-assist</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">B</span>
+                        <span class="meta-value">feat/PRD-0042-overlay</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 진행 단계 -->
+            <div class="progress-section">
+                <div class="section-header">Progress</div>
+                <div class="progress-list">
+                    <div class="progress-item completed">
+                        <div class="progress-icon done">V</div>
+                        <div class="progress-content">
+                            <div class="progress-title">레이아웃 설계</div>
+                            <div class="progress-detail">PRD 작성 완료</div>
+                        </div>
+                    </div>
+                    <div class="progress-item completed">
+                        <div class="progress-icon done">V</div>
+                        <div class="progress-content">
+                            <div class="progress-title">HTML 목업 생성</div>
+                            <div class="progress-detail">v2 완료</div>
+                        </div>
+                    </div>
+                    <div class="progress-item current">
+                        <div class="progress-icon active">3</div>
+                        <div class="progress-content">
+                            <div class="progress-title">WebSocket 서버 구현</div>
+                            <div class="progress-detail">진행 중...</div>
+                        </div>
+                    </div>
+                    <div class="progress-item pending">
+                        <div class="progress-icon waiting">4</div>
+                        <div class="progress-content">
+                            <div class="progress-title">오버레이 컴포넌트</div>
+                            <div class="progress-detail">대기</div>
+                        </div>
+                    </div>
+                    <div class="progress-item pending">
+                        <div class="progress-icon waiting">5</div>
+                        <div class="progress-content">
+                            <div class="progress-title">TDD 상태 연동</div>
+                            <div class="progress-detail">대기</div>
+                        </div>
+                    </div>
+                    <div class="progress-item pending">
+                        <div class="progress-icon waiting">6</div>
+                        <div class="progress-content">
+                            <div class="progress-title">테스트 작성</div>
+                            <div class="progress-detail">대기</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TDD 사이클 -->
+            <div class="tdd-section">
+                <div class="section-header">TDD Cycle</div>
+                <div class="tdd-cycle">
+                    <div class="tdd-phase tdd-red active">RED</div>
+                    <div class="tdd-arrow">></div>
+                    <div class="tdd-phase tdd-green">GRN</div>
+                    <div class="tdd-arrow">></div>
+                    <div class="tdd-phase tdd-refactor">REF</div>
+                </div>
+                <div class="tdd-info">
+                    <div class="tdd-test-count">3 / 7</div>
+                    <div class="tdd-test-label">Tests Passing</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 타임라인 바 -->
+        <div class="bottom-bar">
+            <div class="timeline-header">
+                <div class="timeline-left">
+                    <div class="live-badge">
+                        <div class="live-dot"></div>
+                        LIVE
+                    </div>
+                    <div class="session-time">01:23:45</div>
+                    <span class="session-label">SESSION</span>
+                </div>
+            </div>
+
+            <div class="timeline-container">
+                <div class="timeline-events">
+                    <div class="timeline-track">
+                        <div class="timeline-progress"></div>
+                    </div>
+
+                    <div class="timeline-event" style="left: 0%;">
+                        <div class="event-dot start"></div>
+                        <div class="event-info">
+                            <div class="event-time">00:00</div>
+                            <div class="event-label">START</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event" style="left: 15%;">
+                        <div class="event-dot commit"></div>
+                        <div class="event-info">
+                            <div class="event-time">00:12</div>
+                            <div class="event-label">COMMIT</div>
+                            <div class="event-detail">feat: layout design</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event" style="left: 35%;">
+                        <div class="event-dot test"></div>
+                        <div class="event-info">
+                            <div class="event-time">00:28</div>
+                            <div class="event-label">TEST</div>
+                            <div class="event-detail">3/7 passing</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event" style="left: 55%;">
+                        <div class="event-dot commit"></div>
+                        <div class="event-info">
+                            <div class="event-time">00:45</div>
+                            <div class="event-label">COMMIT</div>
+                            <div class="event-detail">feat: websocket</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event" style="left: 75%;">
+                        <div class="event-dot now"></div>
+                        <div class="event-info">
+                            <div class="event-time">01:23</div>
+                            <div class="event-label">NOW</div>
+                            <div class="event-detail">WebSocket 구현 중</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 얼굴 캠 영역 -->
+        <div class="webcam-area">
+            <div class="webcam-placeholder">
+                <div class="webcam-icon">CAM</div>
+            </div>
+            <div class="webcam-label">320 x 180 (16:9)</div>
+        </div>
+    </div>
+</body>
+</html>

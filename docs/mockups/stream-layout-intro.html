@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>AI Coding Stream Layout - Intro Scene</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #21262d 100%);
+            font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+            color: #c9d1d9;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #8957e5 0%, #58a6ff 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 40px;
+            box-shadow: 0 0 60px rgba(137, 87, 229, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 60px rgba(137, 87, 229, 0.4); }
+            50% { box-shadow: 0 0 100px rgba(137, 87, 229, 0.6); }
+        }
+
+        .logo-text {
+            font-size: 80px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .title {
+            font-size: 64px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 16px;
+            text-shadow: 0 0 40px rgba(88, 166, 255, 0.5);
+        }
+
+        .subtitle {
+            font-size: 28px;
+            color: #8b949e;
+            margin-bottom: 60px;
+        }
+
+        .info-cards {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+
+        .info-card {
+            background: rgba(33, 38, 45, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 32px 48px;
+            min-width: 280px;
+        }
+
+        .info-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .info-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #c9d1d9;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #58a6ff;
+        }
+
+        .countdown {
+            font-size: 120px;
+            font-weight: 700;
+            color: #58a6ff;
+            text-shadow: 0 0 60px rgba(88, 166, 255, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .countdown-label {
+            font-size: 24px;
+            color: #8b949e;
+            letter-spacing: 4px;
+        }
+
+        .social-links {
+            position: absolute;
+            bottom: 60px;
+            display: flex;
+            gap: 40px;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #8b949e;
+            font-size: 18px;
+        }
+
+        .social-icon {
+            width: 32px;
+            height: 32px;
+            background: #21262d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #58a6ff;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-100px) translateX(50px); }
+            50% { transform: translateY(-50px) translateX(-30px); }
+            75% { transform: translateY(-150px) translateX(20px); }
+        }
+
+        .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 20%; top: 80%; animation-delay: 2s; }
+        .particle:nth-child(3) { left: 30%; top: 40%; animation-delay: 4s; }
+        .particle:nth-child(4) { left: 40%; top: 60%; animation-delay: 1s; }
+        .particle:nth-child(5) { left: 50%; top: 30%; animation-delay: 3s; }
+        .particle:nth-child(6) { left: 60%; top: 70%; animation-delay: 5s; }
+        .particle:nth-child(7) { left: 70%; top: 50%; animation-delay: 2s; }
+        .particle:nth-child(8) { left: 80%; top: 20%; animation-delay: 4s; }
+        .particle:nth-child(9) { left: 90%; top: 90%; animation-delay: 1s; }
+        .particle:nth-child(10) { left: 5%; top: 50%; animation-delay: 3s; }
+    </style>
+</head>
+<body>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="container">
+        <div class="logo">
+            <span class="logo-text">AI</span>
+        </div>
+
+        <h1 class="title">AI Coding Stream</h1>
+        <p class="subtitle">Claude Code와 함께하는 실시간 AI 개발 방송</p>
+
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="info-icon">📋</div>
+                <div class="info-title">오늘의 작업</div>
+                <div class="info-value">WebSocket 서버 구현</div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">🎯</div>
+                <div class="info-title">방식</div>
+                <div class="info-value">TDD 개발</div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">📦</div>
+                <div class="info-title">프로젝트</div>
+                <div class="info-value">youtuber</div>
+            </div>
+        </div>
+
+        <div class="countdown">00:30</div>
+        <div class="countdown-label">방송 시작까지</div>
+    </div>
+
+    <div class="social-links">
+        <div class="social-link">
+            <div class="social-icon">🐙</div>
+            <span>github.com/garimto81/claude</span>
+        </div>
+        <div class="social-link">
+            <div class="social-icon">📺</div>
+            <span>YouTube @AICodeStream</span>
+        </div>
+    </div>
+</body>
+</html>

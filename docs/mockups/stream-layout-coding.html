@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>AI Coding Stream Layout - Coding Scene</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: #0d1117;
+            font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+            color: #c9d1d9;
+            overflow: hidden;
+        }
+
+        /* Top Bar - 40px */
+        .top-bar {
+            height: 40px;
+            background: linear-gradient(90deg, #161b22 0%, #21262d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-dot {
+            width: 12px;
+            height: 12px;
+            background: #f85149;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .live-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f85149;
+            letter-spacing: 1px;
+        }
+
+        .session-title {
+            font-size: 16px;
+            color: #8b949e;
+        }
+
+        .stats {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #8b949e;
+        }
+
+        .stat-value {
+            color: #58a6ff;
+            font-weight: 600;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            display: flex;
+            height: calc(1080px - 40px - 120px); /* 920px */
+        }
+
+        /* Terminal Area - 1580px width */
+        .terminal-area {
+            width: 1580px;
+            height: 100%;
+            background: #0d1117;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Claude Code Terminal - Main */
+        .terminal-main {
+            flex: 1;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            height: 36px;
+            background: #21262d;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 8px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #f85149; }
+        .dot-yellow { background: #d29922; }
+        .dot-green { background: #3fb950; }
+
+        .terminal-title {
+            font-size: 13px;
+            color: #8b949e;
+            margin-left: 8px;
+        }
+
+        .terminal-content {
+            padding: 16px;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            height: calc(100% - 36px);
+            overflow: hidden;
+        }
+
+        .prompt {
+            color: #3fb950;
+        }
+
+        .command {
+            color: #58a6ff;
+        }
+
+        .claude-response {
+            color: #c9d1d9;
+            margin: 12px 0;
+            padding-left: 20px;
+            border-left: 2px solid #8957e5;
+        }
+
+        .tool-use {
+            color: #d29922;
+            font-size: 12px;
+        }
+
+        .file-path {
+            color: #58a6ff;
+        }
+
+        /* Editor PIP - Picture in Picture */
+        .editor-pip {
+            height: 280px;
+            background: #1e1e1e;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .editor-header {
+            height: 32px;
+            background: #252526;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            border-bottom: 1px solid #3c3c3c;
+        }
+
+        .editor-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: #1e1e1e;
+            border-radius: 4px 4px 0 0;
+            font-size: 12px;
+            color: #cccccc;
+        }
+
+        .file-icon {
+            color: #519aba;
+        }
+
+        .editor-content {
+            padding: 12px;
+            font-family: 'Cascadia Code', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #d4d4d4;
+        }
+
+        .line-number {
+            color: #858585;
+            margin-right: 16px;
+            user-select: none;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .variable { color: #9cdcfe; }
+        .comment { color: #6a9955; }
+
+        /* Sidebar - 340px */
+        .sidebar {
+            width: 340px;
+            background: #161b22;
+            border-left: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .sidebar-widget {
+            background: #0d1117;
+            padding: 16px;
+        }
+
+        .widget-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Current Task Widget */
+        .task-widget {
+            flex: 0 0 auto;
+        }
+
+        .issue-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #238636;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .issue-number {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .branch-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #58a6ff;
+            background: #21262d;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        .branch-icon {
+            color: #8957e5;
+        }
+
+        /* TDD Status Widget */
+        .tdd-widget {
+            flex: 0 0 auto;
+        }
+
+        .tdd-phase {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #21262d;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .phase-indicator {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .phase-red {
+            background: linear-gradient(135deg, #f85149 0%, #da3633 100%);
+            box-shadow: 0 0 20px rgba(248, 81, 73, 0.4);
+        }
+
+        .phase-green {
+            background: linear-gradient(135deg, #3fb950 0%, #238636 100%);
+            box-shadow: 0 0 20px rgba(63, 185, 80, 0.4);
+        }
+
+        .phase-refactor {
+            background: linear-gradient(135deg, #58a6ff 0%, #1f6feb 100%);
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.4);
+        }
+
+        .phase-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f85149;
+        }
+
+        .phase-description {
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .test-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #21262d;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f85149 0%, #da3633 100%);
+            width: 43%;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f85149;
+        }
+
+        /* GitHub Activity Widget */
+        .github-widget {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .icon-commit {
+            background: #238636;
+        }
+
+        .icon-ci {
+            background: #1f6feb;
+        }
+
+        .icon-pr {
+            background: #8957e5;
+        }
+
+        .activity-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-title {
+            font-size: 13px;
+            color: #c9d1d9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .activity-meta {
+            font-size: 11px;
+            color: #8b949e;
+            margin-top: 2px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-passing {
+            background: rgba(63, 185, 80, 0.2);
+            color: #3fb950;
+        }
+
+        .status-running {
+            background: rgba(210, 153, 34, 0.2);
+            color: #d29922;
+        }
+
+        /* Session Stats Widget */
+        .stats-widget {
+            flex: 0 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: #21262d;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #58a6ff;
+        }
+
+        .stat-card-label {
+            font-size: 11px;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+
+        /* Chat Area - 120px */
+        .chat-area {
+            height: 120px;
+            background: rgba(13, 17, 23, 0.95);
+            border-top: 1px solid #30363d;
+            padding: 12px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .chat-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8b949e;
+        }
+
+        .viewer-count {
+            font-size: 11px;
+            color: #f85149;
+            background: rgba(248, 81, 73, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow: hidden;
+        }
+
+        .chat-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .chat-username {
+            font-weight: 600;
+            color: #58a6ff;
+            flex-shrink: 0;
+        }
+
+        .chat-text {
+            color: #c9d1d9;
+        }
+
+        /* Watermark */
+        .watermark {
+            position: absolute;
+            bottom: 130px;
+            right: 360px;
+            font-size: 11px;
+            color: rgba(139, 148, 158, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="live-indicator">
+            <div class="live-dot"></div>
+            <span class="live-text">LIVE</span>
+            <span class="session-title">Claude Code Session - AI Coding Stream</span>
+        </div>
+        <div class="stats">
+            <div class="stat-item">
+                <span>👁</span>
+                <span class="stat-value">1,234</span>
+            </div>
+            <div class="stat-item">
+                <span>⏱</span>
+                <span class="stat-value">01:23:45</span>
+            </div>
+            <div class="stat-item">
+                <span>📊</span>
+                <span class="stat-value">garimto81/claude</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Terminal Area -->
+        <div class="terminal-area">
+            <!-- Claude Code Terminal -->
+            <div class="terminal-main">
+                <div class="terminal-header">
+                    <div class="terminal-dot dot-red"></div>
+                    <div class="terminal-dot dot-yellow"></div>
+                    <div class="terminal-dot dot-green"></div>
+                    <span class="terminal-title">Claude Code - PowerShell</span>
+                </div>
+                <div class="terminal-content">
+                    <div><span class="prompt">D:\AI\claude01\youtuber&gt;</span> <span class="command">claude</span></div>
+                    <br>
+                    <div class="claude-response">
+                        안녕하세요! AI 코딩 방송 시스템을 구현하겠습니다.<br><br>
+                        먼저 프로젝트 구조를 분석하고 필요한 파일들을 생성하겠습니다.
+                    </div>
+                    <br>
+                    <div class="tool-use">
+                        ⚡ Read <span class="file-path">D:\AI\claude01\youtuber\package.json</span>
+                    </div>
+                    <br>
+                    <div class="claude-response">
+                        package.json을 확인했습니다. 이제 WebSocket 서버를 구현하겠습니다.
+                    </div>
+                    <br>
+                    <div class="tool-use">
+                        ⚡ Write <span class="file-path">D:\AI\claude01\youtuber\src\server\websocket.ts</span>
+                    </div>
+                    <br>
+                    <div class="claude-response">
+                        WebSocket 서버 코드를 작성했습니다.<br>
+                        다음으로 TDD를 위한 테스트 파일을 먼저 작성하겠습니다.
+                    </div>
+                    <br>
+                    <div class="tool-use">
+                        ⚡ Write <span class="file-path">D:\AI\claude01\youtuber\tests\websocket.test.ts</span>
+                    </div>
+                    <br>
+                    <div><span class="prompt">D:\AI\claude01\youtuber&gt;</span> <span class="command">npm test</span></div>
+                    <div style="color: #f85149; margin-top: 8px;">
+                        FAIL  tests/websocket.test.ts<br>
+                        ✕ should connect to WebSocket server (3/7 tests passing)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editor PIP -->
+            <div class="editor-pip">
+                <div class="editor-header">
+                    <div class="editor-tab">
+                        <span class="file-icon">📄</span>
+                        <span>websocket.ts</span>
+                    </div>
+                </div>
+                <div class="editor-content">
+                    <div><span class="line-number"> 1</span><span class="keyword">import</span> { <span class="variable">WebSocketServer</span> } <span class="keyword">from</span> <span class="string">'ws'</span>;</div>
+                    <div><span class="line-number"> 2</span><span class="keyword">import</span> { <span class="variable">EventEmitter</span> } <span class="keyword">from</span> <span class="string">'events'</span>;</div>
+                    <div><span class="line-number"> 3</span></div>
+                    <div><span class="line-number"> 4</span><span class="keyword">export class</span> <span class="function">StreamOverlayServer</span> <span class="keyword">extends</span> <span class="variable">EventEmitter</span> {</div>
+                    <div><span class="line-number"> 5</span>  <span class="keyword">private</span> <span class="variable">wss</span>: <span class="variable">WebSocketServer</span>;</div>
+                    <div><span class="line-number"> 6</span>  <span class="keyword">private</span> <span class="variable">port</span>: <span class="keyword">number</span>;</div>
+                    <div><span class="line-number"> 7</span></div>
+                    <div><span class="line-number"> 8</span>  <span class="function">constructor</span>(<span class="variable">port</span>: <span class="keyword">number</span> = <span class="string">3001</span>) {</div>
+                    <div><span class="line-number"> 9</span>    <span class="keyword">super</span>();</div>
+                    <div><span class="line-number">10</span>    <span class="keyword">this</span>.<span class="variable">port</span> = <span class="variable">port</span>;</div>
+                    <div><span class="line-number">11</span>    <span class="keyword">this</span>.<span class="function">initialize</span>();</div>
+                    <div><span class="line-number">12</span>  }</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Current Task -->
+            <div class="sidebar-widget task-widget">
+                <div class="widget-title">📋 현재 작업</div>
+                <div class="issue-badge">
+                    <span>🔧</span>
+                    <span>WebSocket 서버 구현</span>
+                    <span class="issue-number">#123</span>
+                </div>
+                <div class="branch-info">
+                    <span class="branch-icon">🌿</span>
+                    <span>feat/PRD-0001-123-websocket</span>
+                </div>
+            </div>
+
+            <!-- TDD Status -->
+            <div class="sidebar-widget tdd-widget">
+                <div class="widget-title">📊 TDD 상태</div>
+                <div class="tdd-phase">
+                    <div class="phase-indicator phase-red">R</div>
+                    <div>
+                        <div class="phase-text">RED Phase</div>
+                        <div class="phase-description">테스트 실패 → 코드 작성 중</div>
+                    </div>
+                </div>
+                <div class="test-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <span class="progress-text">3/7</span>
+                </div>
+            </div>
+
+            <!-- GitHub Activity -->
+            <div class="sidebar-widget github-widget">
+                <div class="widget-title">📈 GitHub 활동</div>
+                <div class="activity-item">
+                    <div class="activity-icon icon-commit">📝</div>
+                    <div class="activity-content">
+                        <div class="activity-title">feat: add websocket server</div>
+                        <div class="activity-meta">2분 전</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon icon-ci">🔄</div>
+                    <div class="activity-content">
+                        <div class="activity-title">CI/CD Pipeline</div>
+                        <div class="activity-meta">
+                            <span class="status-badge status-running">● Running</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon icon-commit">📝</div>
+                    <div class="activity-content">
+                        <div class="activity-title">test: add websocket tests</div>
+                        <div class="activity-meta">5분 전</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon icon-pr">🔀</div>
+                    <div class="activity-content">
+                        <div class="activity-title">PR #42 - WebSocket 구현</div>
+                        <div class="activity-meta">
+                            <span class="status-badge status-passing">✓ Open</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Stats -->
+            <div class="sidebar-widget stats-widget">
+                <div class="widget-title">📈 세션 통계</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-value">142</div>
+                        <div class="stat-card-label">Lines Changed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value">5</div>
+                        <div class="stat-card-label">Commits</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value">7</div>
+                        <div class="stat-card-label">Files Modified</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value">1</div>
+                        <div class="stat-card-label">PR Created</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area">
+        <div class="chat-header">
+            <span>💬</span>
+            <span class="chat-title">YouTube Live Chat</span>
+            <span class="viewer-count">🔴 1,234 watching</span>
+        </div>
+        <div class="chat-messages">
+            <div class="chat-message">
+                <span class="chat-username">DevFan123:</span>
+                <span class="chat-text">TDD로 개발하시네요! Red-Green-Refactor 사이클 좋아요 👍</span>
+            </div>
+            <div class="chat-message">
+                <span class="chat-username">코딩초보:</span>
+                <span class="chat-text">Claude Code가 테스트도 먼저 작성하네요 신기하다</span>
+            </div>
+            <div class="chat-message">
+                <span class="chat-username">AIEnthusiast:</span>
+                <span class="chat-text">WebSocket 서버 구현 중이시군요! 어떤 라이브러리 쓰세요?</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Watermark -->
+    <div class="watermark">garimto81/claude • Claude Code Stream</div>
+</body>
+</html>

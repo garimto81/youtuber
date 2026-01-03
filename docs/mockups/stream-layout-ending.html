@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>AI Coding Stream Layout - Ending Scene</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #21262d 100%);
+            font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+            color: #c9d1d9;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            padding: 0 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .thank-you {
+            font-size: 64px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 16px;
+            text-shadow: 0 0 40px rgba(88, 166, 255, 0.5);
+        }
+
+        .session-end {
+            font-size: 24px;
+            color: #8b949e;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .summary-card {
+            background: rgba(33, 38, 45, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Session Stats Card */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #58a6ff;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #8b949e;
+            margin-top: 8px;
+        }
+
+        /* Completed Work Card */
+        .work-list {
+            list-style: none;
+        }
+
+        .work-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .work-item:last-child {
+            border-bottom: none;
+        }
+
+        .work-check {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #238636 0%, #3fb950 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            box-shadow: 0 0 20px rgba(35, 134, 54, 0.4);
+        }
+
+        .work-content {
+            flex: 1;
+        }
+
+        .work-title {
+            font-size: 18px;
+            color: #c9d1d9;
+            font-weight: 600;
+        }
+
+        .work-meta {
+            font-size: 13px;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+
+        .pr-badge {
+            background: #8957e5;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* GitHub Summary Card */
+        .github-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .github-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: #0d1117;
+            border-radius: 12px;
+        }
+
+        .github-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .icon-commits { background: #238636; }
+        .icon-pr { background: #8957e5; }
+        .icon-issues { background: #1f6feb; }
+
+        .github-content {
+            flex: 1;
+        }
+
+        .github-title {
+            font-size: 16px;
+            color: #c9d1d9;
+        }
+
+        .github-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #58a6ff;
+        }
+
+        /* Follow Section */
+        .follow-section {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .follow-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(33, 38, 45, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 20px 32px;
+        }
+
+        .follow-icon {
+            width: 48px;
+            height: 48px;
+            background: #21262d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .follow-info {
+            text-align: left;
+        }
+
+        .follow-label {
+            font-size: 13px;
+            color: #8b949e;
+        }
+
+        .follow-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #58a6ff;
+        }
+
+        /* Next Stream */
+        .next-stream {
+            text-align: center;
+        }
+
+        .next-label {
+            font-size: 16px;
+            color: #8b949e;
+            margin-bottom: 12px;
+        }
+
+        .next-schedule {
+            font-size: 28px;
+            font-weight: 600;
+            color: #d29922;
+        }
+
+        /* Decorative Elements */
+        .confetti {
+            position: absolute;
+            font-size: 30px;
+            animation: fall 8s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(1200px) rotate(720deg); opacity: 0; }
+        }
+
+        .confetti:nth-child(1) { left: 5%; animation-delay: 0s; }
+        .confetti:nth-child(2) { left: 15%; animation-delay: 1s; }
+        .confetti:nth-child(3) { left: 25%; animation-delay: 2s; }
+        .confetti:nth-child(4) { left: 35%; animation-delay: 3s; }
+        .confetti:nth-child(5) { left: 45%; animation-delay: 0.5s; }
+        .confetti:nth-child(6) { left: 55%; animation-delay: 1.5s; }
+        .confetti:nth-child(7) { left: 65%; animation-delay: 2.5s; }
+        .confetti:nth-child(8) { left: 75%; animation-delay: 3.5s; }
+        .confetti:nth-child(9) { left: 85%; animation-delay: 0.8s; }
+        .confetti:nth-child(10) { left: 95%; animation-delay: 1.8s; }
+    </style>
+</head>
+<body>
+    <!-- Confetti -->
+    <div class="confetti">🎉</div>
+    <div class="confetti">✨</div>
+    <div class="confetti">🌟</div>
+    <div class="confetti">💫</div>
+    <div class="confetti">⭐</div>
+    <div class="confetti">🎊</div>
+    <div class="confetti">🎉</div>
+    <div class="confetti">✨</div>
+    <div class="confetti">🌟</div>
+    <div class="confetti">💫</div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="thank-you">오늘도 함께해주셔서 감사합니다! 🙏</h1>
+            <p class="session-end">AI Coding Stream이 종료되었습니다</p>
+        </div>
+
+        <!-- Summary Grid -->
+        <div class="summary-grid">
+            <!-- Session Stats -->
+            <div class="summary-card">
+                <div class="card-title">📊 세션 통계</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">2:15</div>
+                        <div class="stat-label">방송 시간</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">287</div>
+                        <div class="stat-label">Lines Changed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Commits</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">7/7</div>
+                        <div class="stat-label">Tests Passed</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GitHub Summary -->
+            <div class="summary-card">
+                <div class="card-title">📈 GitHub 활동</div>
+                <div class="github-summary">
+                    <div class="github-item">
+                        <div class="github-icon icon-commits">📝</div>
+                        <div class="github-content">
+                            <div class="github-title">Commits</div>
+                            <div class="github-value">12 commits pushed</div>
+                        </div>
+                    </div>
+                    <div class="github-item">
+                        <div class="github-icon icon-pr">🔀</div>
+                        <div class="github-content">
+                            <div class="github-title">Pull Request</div>
+                            <div class="github-value">PR #42 Merged ✓</div>
+                        </div>
+                    </div>
+                    <div class="github-item">
+                        <div class="github-icon icon-issues">✅</div>
+                        <div class="github-content">
+                            <div class="github-title">Issue</div>
+                            <div class="github-value">Issue #123 Closed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Work -->
+            <div class="summary-card" style="grid-column: span 2;">
+                <div class="card-title">✅ 오늘 완료한 작업</div>
+                <ul class="work-list">
+                    <li class="work-item">
+                        <div class="work-check">✓</div>
+                        <div class="work-content">
+                            <div class="work-title">WebSocket 서버 구현</div>
+                            <div class="work-meta">실시간 오버레이 통신을 위한 WebSocket 서버 완성</div>
+                        </div>
+                        <span class="pr-badge">PR #42</span>
+                    </li>
+                    <li class="work-item">
+                        <div class="work-check">✓</div>
+                        <div class="work-content">
+                            <div class="work-title">GitHub Webhook 연동</div>
+                            <div class="work-meta">커밋, PR, CI 상태를 실시간으로 수신하는 엔드포인트 구현</div>
+                        </div>
+                    </li>
+                    <li class="work-item">
+                        <div class="work-check">✓</div>
+                        <div class="work-content">
+                            <div class="work-title">TDD 사이클 완료</div>
+                            <div class="work-meta">7개 테스트 모두 통과 (Red → Green → Refactor)</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Follow Section -->
+        <div class="follow-section">
+            <div class="follow-card">
+                <div class="follow-icon">🐙</div>
+                <div class="follow-info">
+                    <div class="follow-label">GitHub</div>
+                    <div class="follow-value">github.com/garimto81/claude</div>
+                </div>
+            </div>
+            <div class="follow-card">
+                <div class="follow-icon">📺</div>
+                <div class="follow-info">
+                    <div class="follow-label">YouTube</div>
+                    <div class="follow-value">구독 & 알림 설정</div>
+                </div>
+            </div>
+            <div class="follow-card">
+                <div class="follow-icon">💬</div>
+                <div class="follow-info">
+                    <div class="follow-label">Discord</div>
+                    <div class="follow-value">AI Coders Community</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Stream -->
+        <div class="next-stream">
+            <div class="next-label">다음 방송 예정</div>
+            <div class="next-schedule">매주 화/목/토 저녁 8시</div>
+        </div>
+    </div>
+</body>
+</html>
