@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Stream Layout - Coding Scene v3 (Minimal)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-main: #0d1117;
+            --bg-panel: #161b22;
+            --bg-hover: #21262d;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-purple: #8957e5;
+            --accent-yellow: #d29922;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: var(--bg-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1600px 320px;
+            grid-template-rows: 1fr 60px;
+            width: 1920px;
+            height: 1080px;
+        }
+
+        /* ================================
+           화면 캡처 영역 (OBS Window Capture)
+           ================================ */
+        .screen-capture {
+            grid-column: 1;
+            grid-row: 1;
+            background: rgba(13, 17, 23, 0.3);
+            border: 2px dashed var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .screen-capture-label {
+            font-size: 20px;
+            color: var(--text-secondary);
+        }
+
+        .screen-capture-size {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--accent-blue);
+        }
+
+        .screen-capture-note {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* ================================
+           우측 패널 - 미니멀 디자인
+           ================================ */
+        .right-panel {
+            grid-column: 2;
+            grid-row: 1;
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 얼굴 캠 영역 */
+        .facecam-area {
+            height: 180px;
+            background: var(--bg-main);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .facecam-placeholder {
+            width: 280px;
+            height: 158px;
+            background: var(--bg-hover);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .facecam-icon {
+            font-size: 32px;
+            opacity: 0.5;
+        }
+
+        .facecam-label {
+            font-size: 12px;
+        }
+
+        /* 활성 프로젝트 섹션 */
+        .projects-section {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-title .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .project-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-hover);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .project-item.active {
+            border-left-color: var(--accent-green);
+            background: rgba(63, 185, 80, 0.1);
+        }
+
+        .project-icon {
+            font-size: 16px;
+        }
+
+        .project-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .project-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .project-meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .project-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .badge-active {
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--accent-green);
+        }
+
+        /* 최근 커밋 섹션 */
+        .commits-section {
+            flex: 1;
+            padding: 16px;
+            overflow: hidden;
+        }
+
+        .commit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .commit-item {
+            display: flex;
+            gap: 10px;
+        }
+
+        .commit-line {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 20px;
+        }
+
+        .commit-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .commit-connector {
+            flex: 1;
+            width: 2px;
+            background: var(--border);
+            margin-top: 4px;
+        }
+
+        .commit-item:last-child .commit-connector {
+            display: none;
+        }
+
+        .commit-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .commit-message {
+            font-size: 12px;
+            color: var(--text-primary);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .commit-meta {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .commit-repo {
+            color: var(--accent-blue);
+        }
+
+        /* ================================
+           하단 바 - 실시간 활동 피드
+           ================================ */
+        .bottom-bar {
+            grid-column: 1 / -1;
+            grid-row: 2;
+            background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-main) 100%);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 24px;
+        }
+
+        /* LIVE 표시 */
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(248, 81, 73, 0.15);
+            border: 1px solid var(--accent-red);
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .live-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-red);
+            letter-spacing: 1px;
+        }
+
+        .live-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        /* 구분선 */
+        .divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+        }
+
+        /* 실시간 활동 피드 */
+        .activity-feed {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            overflow: hidden;
+        }
+
+        .feed-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .feed-items {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .feed-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--bg-hover);
+            border-radius: 6px;
+            flex-shrink: 0;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .feed-icon {
+            font-size: 14px;
+        }
+
+        .feed-text {
+            font-size: 12px;
+            color: var(--text-primary);
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .feed-time {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        .feed-item.commit {
+            border-left: 2px solid var(--accent-purple);
+        }
+
+        .feed-item.issue {
+            border-left: 2px solid var(--accent-green);
+        }
+
+        .feed-item.pr {
+            border-left: 2px solid var(--accent-blue);
+        }
+
+        /* 현재 레포 표시 */
+        .current-repo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-hover);
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .repo-icon {
+            font-size: 14px;
+        }
+
+        .repo-name {
+            font-size: 12px;
+            color: var(--accent-blue);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 화면 캡처 영역 -->
+        <div class="screen-capture">
+            <div class="screen-capture-label">📺 OBS Window Capture</div>
+            <div class="screen-capture-size">1600 × 1020</div>
+            <div class="screen-capture-note">Claude Code / VS Code / Terminal</div>
+        </div>
+
+        <!-- 우측 패널 -->
+        <div class="right-panel">
+            <!-- 얼굴 캠 -->
+            <div class="facecam-area">
+                <div class="facecam-placeholder">
+                    <span class="facecam-icon">📷</span>
+                    <span class="facecam-label">Webcam (16:9)</span>
+                </div>
+            </div>
+
+            <!-- 활성 프로젝트 -->
+            <div class="projects-section">
+                <div class="section-title">
+                    <span class="dot"></span>
+                    Active Projects
+                </div>
+                <div class="project-list">
+                    <div class="project-item active">
+                        <span class="project-icon">📦</span>
+                        <div class="project-info">
+                            <div class="project-name">youtuber</div>
+                            <div class="project-meta">3 commits today</div>
+                        </div>
+                        <span class="project-badge badge-active">NOW</span>
+                    </div>
+                    <div class="project-item">
+                        <span class="project-icon">📦</span>
+                        <div class="project-info">
+                            <div class="project-name">tft-assist</div>
+                            <div class="project-meta">Updated 2d ago</div>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <span class="project-icon">📦</span>
+                        <div class="project-info">
+                            <div class="project-name">claude</div>
+                            <div class="project-meta">Updated 3d ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 최근 커밋 -->
+            <div class="commits-section">
+                <div class="section-title">Recent Commits</div>
+                <div class="commit-list">
+                    <div class="commit-item">
+                        <div class="commit-line">
+                            <div class="commit-dot"></div>
+                            <div class="commit-connector"></div>
+                        </div>
+                        <div class="commit-content">
+                            <div class="commit-message">docs(stream): add PRD and layout mockups 📝</div>
+                            <div class="commit-meta">
+                                <span class="commit-repo">youtuber</span>
+                                <span>2분 전</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="commit-item">
+                        <div class="commit-line">
+                            <div class="commit-dot"></div>
+                            <div class="commit-connector"></div>
+                        </div>
+                        <div class="commit-content">
+                            <div class="commit-message">fix(docs): add missing commands to COMMAND_REFERENCE.md 🐛</div>
+                            <div class="commit-meta">
+                                <span class="commit-repo">claude</span>
+                                <span>1시간 전</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="commit-item">
+                        <div class="commit-line">
+                            <div class="commit-dot"></div>
+                        </div>
+                        <div class="commit-content">
+                            <div class="commit-message">feat(champion): add tier list endpoint ✨</div>
+                            <div class="commit-meta">
+                                <span class="commit-repo">tft-assist</span>
+                                <span>2일 전</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 바 -->
+        <div class="bottom-bar">
+            <!-- LIVE 표시 -->
+            <div class="live-badge">
+                <div class="live-dot"></div>
+                <span class="live-text">LIVE</span>
+                <span class="live-time">01:23:45</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- 실시간 활동 피드 -->
+            <div class="activity-feed">
+                <span class="feed-label">Activity</span>
+                <div class="feed-items">
+                    <div class="feed-item commit">
+                        <span class="feed-icon">📝</span>
+                        <span class="feed-text">docs(stream): add PRD and layout mockups</span>
+                        <span class="feed-time">2분 전</span>
+                    </div>
+                    <div class="feed-item issue">
+                        <span class="feed-icon">🎯</span>
+                        <span class="feed-text">#3 오버레이 전체 UX 개선</span>
+                        <span class="feed-time">5분 전</span>
+                    </div>
+                    <div class="feed-item pr">
+                        <span class="feed-icon">🔀</span>
+                        <span class="feed-text">PR #42 merged</span>
+                        <span class="feed-time">10분 전</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- 현재 레포 -->
+            <div class="current-repo">
+                <span class="repo-icon">📂</span>
+                <span class="repo-name">garimto81/youtuber</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
