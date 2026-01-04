@@ -9,6 +9,8 @@ import type {
   ActiveProject,
   ActivityItem,
   SubscriptionChannel,
+  OverlayConfigPayload,
+  OverlayAmountPayload,
 } from '../types/index.js';
 
 // ========================================
@@ -93,6 +95,9 @@ interface OverlayState {
   activities: ActivityItem[];
   tdd: TDDStatusPayload | null;
   sessionStart: Date | null;
+  streamTitle: string;
+  currentAmount: number;
+  goalAmount: number;
 }
 
 const state: OverlayState = {
@@ -100,6 +105,9 @@ const state: OverlayState = {
   activities: [],
   tdd: null,
   sessionStart: null,
+  streamTitle: '오늘의 코딩',
+  currentAmount: 0,
+  goalAmount: 10000000000,
 };
 
 const MAX_ACTIVITIES = 8;
@@ -110,8 +118,10 @@ const MAX_PROJECTS = 5;
 // ========================================
 const projectListEl = document.getElementById('project-list')!;
 const activityFeedEl = document.getElementById('activity-feed')!;
-const sessionTimerEl = document.getElementById('session-timer')!;
 const timerValueEl = document.getElementById('timer-value')!;
+const streamTitleEl = document.getElementById('stream-title')!;
+const currentAmountEl = document.getElementById('current-amount')!;
+const goalAmountEl = document.getElementById('goal-amount')!;
 
 // ========================================
 // 렌더링 함수
@@ -204,13 +214,22 @@ function renderTDD(): void {
 
 function updateSessionTimer(): void {
   if (!state.sessionStart) {
-    sessionTimerEl.classList.add('hidden');
+    timerValueEl.textContent = '00:00:00';
     return;
   }
 
-  sessionTimerEl.classList.remove('hidden');
   const elapsed = Math.floor((Date.now() - state.sessionStart.getTime()) / 1000);
   timerValueEl.textContent = formatDuration(elapsed);
+}
+
+function renderHeader(): void {
+  streamTitleEl.textContent = state.streamTitle;
+  currentAmountEl.textContent = formatAmount(state.currentAmount);
+  goalAmountEl.textContent = formatAmount(state.goalAmount);
+}
+
+function formatAmount(num: number): string {
+  return num.toLocaleString('ko-KR');
 }
 
 // ========================================
@@ -376,6 +395,21 @@ function handleMessage(message: ServerMessage): void {
       renderProjects();
       break;
     }
+
+    case 'overlay:config': {
+      const payload = message.payload as OverlayConfigPayload;
+      if (payload.title) state.streamTitle = payload.title;
+      if (payload.goalAmount) state.goalAmount = payload.goalAmount;
+      renderHeader();
+      break;
+    }
+
+    case 'overlay:amount': {
+      const payload = message.payload as OverlayAmountPayload;
+      state.currentAmount = payload.amount;
+      renderHeader();
+      break;
+    }
   }
 }
 
@@ -395,6 +429,7 @@ function init(): void {
   setInterval(updateSessionTimer, 1000);
 
   // 초기 렌더링
+  renderHeader();
   renderProjects();
   renderActivities();
 

@@ -142,4 +142,33 @@ describe('Overlay Server', () => {
       expect(data.received).toBe(true);
     });
   });
+
+  describe('Overlay Config API', () => {
+    it('should update overlay config', async () => {
+      const response = await fetch(`${BASE_URL}/api/overlay/config`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: 'AI 코딩 방송',
+          goalAmount: 10000000000,
+        }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+    });
+
+    it('should update overlay amount', async () => {
+      const response = await fetch(`${BASE_URL}/api/overlay/amount`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 5000000 }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+    });
+  });
 });

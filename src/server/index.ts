@@ -237,6 +237,34 @@ app.get('/api/obs/status', async (_req, res) => {
   });
 });
 
+// 오버레이 설정 업데이트
+app.post('/api/overlay/config', (req, res) => {
+  const { title, goalAmount } = req.body;
+
+  wsManager.broadcastAll({
+    type: 'overlay:config',
+    payload: { title, goalAmount },
+    timestamp: new Date().toISOString(),
+  });
+
+  console.log(`[Overlay] Config updated: ${title || 'no title'}, goal: ${goalAmount || 'no change'}`);
+  res.json({ success: true });
+});
+
+// 오버레이 금액 업데이트
+app.post('/api/overlay/amount', (req, res) => {
+  const { amount } = req.body;
+
+  wsManager.broadcastAll({
+    type: 'overlay:amount',
+    payload: { amount },
+    timestamp: new Date().toISOString(),
+  });
+
+  console.log(`[Overlay] Amount updated: ${amount}`);
+  res.json({ success: true });
+});
+
 // 서버 시작
 server.listen(PORT, HOST, async () => {
   console.log(`[Server] Running at http://${HOST}:${PORT}`);

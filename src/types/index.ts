@@ -10,7 +10,9 @@ export type MessageType =
   | 'session:start'
   | 'session:end'
   | 'project:active'
-  | 'project:switch';
+  | 'project:switch'
+  | 'overlay:config'
+  | 'overlay:amount';
 
 export type SubscriptionChannel = 'github' | 'tdd' | 'session' | 'project';
 
@@ -102,4 +104,14 @@ export interface ActivityItem {
   timestamp: string;
   icon: string;
   color: string;
+}
+
+// 오버레이 설정
+export interface OverlayConfigPayload {
+  title?: string;
+  goalAmount?: number;
+}
+
+export interface OverlayAmountPayload {
+  amount: number;
 }

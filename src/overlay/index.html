@@ -7,7 +7,21 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- 1920x1080 전체 레이아웃 -->
+  <!-- 상단 헤더 -->
+  <header class="top-header">
+    <div class="header-title" id="stream-title">오늘의 코딩</div>
+    <div class="header-timer">
+      <span class="timer-label">SESSION</span>
+      <span id="timer-value" class="timer-value">00:00:00</span>
+    </div>
+    <div class="header-amount">
+      <span id="current-amount">0</span>
+      <span class="amount-separator">/</span>
+      <span id="goal-amount">10,000,000,000</span>
+    </div>
+  </header>
+
+  <!-- 1920x1040 전체 레이아웃 (헤더 40px 제외) -->
   <div class="overlay-container">
 
     <!-- 좌측: 화면 캡처 영역 (1600x900) - OBS에서 처리 -->
@@ -44,12 +58,6 @@
       </div>
     </footer>
 
-  </div>
-
-  <!-- 세션 타이머 (우측 상단 코너) -->
-  <div id="session-timer" class="session-timer hidden">
-    <span class="timer-label">SESSION</span>
-    <span id="timer-value" class="timer-value">00:00:00</span>
   </div>
 
   <script type="module" src="app.js"></script>

@@ -18,10 +18,11 @@
   --accent-yellow: #d29922;
 
   /* 레이아웃 크기 */
+  --header-height: 40px;
   --main-width: 1600px;
-  --main-height: 900px;
+  --main-height: 940px;
   --right-panel-width: 320px;
-  --bottom-bar-height: 180px;
+  --bottom-bar-height: 100px;
   --cam-height: 180px;
 }
 
@@ -41,10 +42,71 @@ body {
   overflow: hidden;
 }
 
+/* 상단 헤더 */
+.top-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: var(--header-height);
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 200;
+}
+
+.header-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.header-timer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-secondary);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.header-timer .timer-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-green);
+  text-transform: uppercase;
+}
+
+.header-timer .timer-value {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--text-primary);
+}
+
+.header-amount {
+  font-size: 14px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--accent-green);
+  font-weight: 600;
+  margin-left: 24px;
+}
+
+.header-amount .amount-separator {
+  color: var(--text-secondary);
+  margin: 0 4px;
+}
+
 /* 전체 컨테이너 */
 .overlay-container {
   width: 1920px;
-  height: 1080px;
+  height: calc(1080px - var(--header-height));
+  margin-top: var(--header-height);
   display: grid;
   grid-template-columns: var(--main-width) var(--right-panel-width);
   grid-template-rows: var(--main-height) var(--bottom-bar-height);
@@ -184,18 +246,18 @@ body {
   scroll-behavior: smooth;
 }
 
-/* 활동 카드 (하단 바) */
+/* 활동 카드 (하단 바) - 축소 버전 */
 .activity-card {
   flex-shrink: 0;
-  width: 180px;
-  height: 140px;
+  width: 160px;
+  height: 70px;
   background: var(--bg-secondary);
   border: 2px solid var(--border-color);
-  border-radius: 10px;
-  padding: 14px;
+  border-radius: 8px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   animation: slideIn 0.3s ease-out;
 }
 
@@ -218,7 +280,7 @@ body {
 .activity-card.prd { border-color: var(--accent-blue); }
 
 .activity-card .activity-repo {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
@@ -229,28 +291,28 @@ body {
 .activity-card .activity-type {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 4px;
+  font-size: 11px;
   color: var(--text-secondary);
 }
 
 .activity-card .activity-icon {
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .activity-card .activity-content {
   flex: 1;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
-  line-height: 1.4;
+  line-height: 1.3;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
 }
 
 .activity-card .activity-time {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-secondary);
   text-align: right;
 }
