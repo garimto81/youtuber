@@ -1,6 +1,6 @@
 {
   "name": "youtuber-monorepo",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "AI Coding YouTube 방송 시스템 (Monorepo)",
   "private": true,
   "type": "module",
