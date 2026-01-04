@@ -1,0 +1,47 @@
+{
+  "name": "youtuber-stream-overlay",
+  "version": "1.0.0",
+  "description": "AI Coding YouTube 방송 오버레이 시스템",
+  "main": "dist/server/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server/index.ts",
+    "build": "tsc && tsc -p tsconfig.overlay.json",
+    "build:server": "tsc",
+    "build:overlay": "tsc -p tsconfig.overlay.json",
+    "start": "node dist/server/index.js",
+    "lint": "eslint src/ --ext .ts",
+    "lint:fix": "eslint src/ --ext .ts --fix",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "youtube",
+    "streaming",
+    "overlay",
+    "obs",
+    "claude-code"
+  ],
+  "author": "garimto81",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.0",
+    "ws": "^8.18.0",
+    "obs-websocket-js": "^5.0.6",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.0",
+    "@types/ws": "^8.5.12",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "eslint": "^8.57.0",
+    "tsx": "^4.15.6",
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
