@@ -160,11 +160,7 @@ function renderActivities(): void {
     activityFeedEl.innerHTML = `
       <div class="activity-card placeholder">
         <div class="activity-repo">시작 대기</div>
-        <div class="activity-type">
-          <span class="activity-icon">⏳</span>
-          <span>Waiting</span>
-        </div>
-        <div class="activity-content">활동이 표시됩니다</div>
+        <div class="activity-summary">⏳ 활동이 표시됩니다</div>
       </div>
     `;
     return;
@@ -176,12 +172,7 @@ function renderActivities(): void {
       (activity) => `
       <div class="activity-card ${getActivityClass(activity.type)}">
         <div class="activity-repo">${activity.repo}</div>
-        <div class="activity-type">
-          <span class="activity-icon">${activity.icon}</span>
-          <span>${getActivityLabel(activity.type)}</span>
-        </div>
-        <div class="activity-content">${activity.content}</div>
-        <div class="activity-time">${formatRelativeTime(activity.timestamp)}</div>
+        <div class="activity-summary">${activity.icon} ${activity.content}</div>
       </div>
     `
     )
@@ -265,16 +256,6 @@ function getActivityClass(type: string): string {
   return classMap[type] || '';
 }
 
-function getActivityLabel(type: string): string {
-  const labelMap: Record<string, string> = {
-    commit: 'Commit',
-    pr: 'PR',
-    issue: 'Issue',
-    ci: 'CI',
-    prd: 'PRD',
-  };
-  return labelMap[type] || type;
-}
 
 function addActivity(activity: ActivityItem): void {
   // 중복 방지

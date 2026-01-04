@@ -280,7 +280,7 @@ body {
 .activity-card.prd { border-color: var(--accent-blue); }
 
 .activity-card .activity-repo {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
@@ -288,33 +288,14 @@ body {
   text-overflow: ellipsis;
 }
 
-.activity-card .activity-type {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: var(--text-secondary);
-}
-
-.activity-card .activity-icon {
+.activity-card .activity-summary {
   font-size: 12px;
-}
-
-.activity-card .activity-content {
-  flex: 1;
-  font-size: 11px;
   color: var(--text-secondary);
-  line-height: 1.3;
+  line-height: 1.4;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
-}
-
-.activity-card .activity-time {
-  font-size: 9px;
-  color: var(--text-secondary);
-  text-align: right;
 }
 
 .activity-card.placeholder {
