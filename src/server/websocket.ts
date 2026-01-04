@@ -58,9 +58,9 @@ export class WebSocketManager {
         this.clients.delete(client);
       });
 
-      // 연결 확인 메시지 전송
+      // 연결 확인 메시지 전송 (session:stats로 현재 상태 알림)
       this.sendToClient(client, {
-        type: 'session:start',
+        type: 'session:stats',
         payload: { connected: true },
         timestamp: new Date().toISOString(),
       });
