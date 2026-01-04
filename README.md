@@ -15,6 +15,24 @@ Claude Code (CLI) 기반 AI 코딩 작업 과정을 YouTube에서 실시간으�
 
 ## 빠른 시작
 
+### 방법 1: Docker (권장)
+
+```bash
+# 1. 환경 변수 설정
+cp .env.example .env
+# .env 파일을 편집하여 OBS 설정 등 입력
+
+# 2. Docker Compose로 실행
+docker-compose up -d
+
+# 3. 오버레이 확인
+# http://localhost:3001/overlay/
+```
+
+**Docker 상세 가이드**: [docs/DOCKER_GUIDE.md](docs/DOCKER_GUIDE.md)
+
+### 방법 2: 로컬 개발
+
 ```powershell
 # 1. 의존성 설치 (pnpm workspace)
 pnpm install
@@ -149,6 +167,8 @@ YOUTUBE_CHANNEL_ID=your_channel_id
 - **OBS**: obs-websocket-js 5.x
 - **Test**: Vitest
 - **Build**: tsc (TypeScript Compiler)
+- **Container**: Docker + Docker Compose
+- **Security**: Helmet.js, express-rate-limit
 
 ## 개발
 
@@ -188,6 +208,8 @@ pnpm lint:fix
 ## 문서
 
 - `CLAUDE.md` - Claude Code를 위한 개발 가이드
+- `docs/DOCKER_GUIDE.md` - Docker 배포 가이드
+- `docs/DEPLOYMENT_IMPROVEMENT_PROPOSAL.md` - 배포 개선 제안서
 - `docs/PRD-0001-stream-system.md` - 스트림 시스템 PRD (v5 레이아웃)
 - `packages/shared/src/types/index.ts` - 전체 타입 정의
 

@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # YouTube 스트림 서버
+  stream-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: youtuber-stream:latest
+    container_name: youtuber-stream
+    ports:
+      - "${PORT:-3001}:3001"
+    environment:
+      # 서버 설정
+      - NODE_ENV=production
+      - PORT=3001
+      - HOST=0.0.0.0
+
+      # OBS WebSocket (호스트 머신의 OBS 연결)
+      - OBS_WS_HOST=${OBS_WS_HOST:-host.docker.internal}
+      - OBS_WS_PORT=${OBS_WS_PORT:-4455}
+      - OBS_WS_PASSWORD=${OBS_WS_PASSWORD}
+
+      # GitHub 설정
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+      - GITHUB_USERNAME=${GITHUB_USERNAME:-garimto81}
+
+      # YouTube API (선택)
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - YOUTUBE_CHANNEL_ID=${YOUTUBE_CHANNEL_ID}
+
+    # 오버레이 정적 파일 볼륨 마운트 (개발 시)
+    # volumes:
+    #   - ./packages/overlay/dist:/app/packages/overlay/dist:ro
+    #   - ./packages/overlay/public:/app/packages/overlay/public:ro
+
+    restart: unless-stopped
+
+    # 네트워크
+    networks:
+      - youtuber-net
+
+    # 헬스체크
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+
+    # 리소스 제한 (선택)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+networks:
+  youtuber-net:
+    driver: bridge

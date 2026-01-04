@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+coverage/
+
+# Git
+.git/
+.github/
+.gitignore
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+!README.md
+docs/
+tasks/
+
+# Testing
+tests/
+*.test.ts
+*.spec.ts
+vitest.config.ts
+
+# Archives
+archive/
+
+# Scripts
+scripts/
+
+# Temporary
+tmp/
+temp/
+.cache/
