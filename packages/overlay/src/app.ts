@@ -131,8 +131,8 @@ function renderProjects(): void {
   if (state.projects.length === 0) {
     projectListEl.innerHTML = `
       <div class="project-card placeholder">
-        <div class="project-name">대기 중...</div>
-        <div class="project-commit">GitHub 연결을 기다리는 중</div>
+        <div class="project-name">프로젝트 로딩 중...</div>
+        <div class="project-commit">GitHub에서 최근 활동을 조회합니다</div>
       </div>
     `;
     return;
@@ -159,8 +159,8 @@ function renderActivities(): void {
   if (state.activities.length === 0) {
     activityFeedEl.innerHTML = `
       <div class="activity-card placeholder">
-        <div class="activity-repo">시작 대기</div>
-        <div class="activity-summary">⏳ 활동이 표시됩니다</div>
+        <div class="activity-repo">세션 대기</div>
+        <div class="activity-summary">⏳ 커밋, PR, 이슈 활동이 표시됩니다</div>
       </div>
     `;
     return;
