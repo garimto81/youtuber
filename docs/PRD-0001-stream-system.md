@@ -123,7 +123,7 @@ GET /repos/{owner}/{repo}/pulls
 
 ### 3.2 Scene 2: Coding (메인 코딩 화면) - v5 상단 헤더 + 축소 하단
 
-![Coding Scene](images/stream-layout-coding-v5.png)
+![Coding Scene v5](images/overlay-v5-layout.png)
 
 **핵심 컨셉:**
 > **상단 헤더 + 축소 하단**: 시청자에게 핵심 정보를 한눈에 전달
