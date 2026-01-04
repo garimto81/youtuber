@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import { WebSocketManager } from './websocket.js';
 import { createGitHubWebhookRouter } from './github-webhook.js';
 import { OBSController } from './obs-controller.js';
@@ -28,6 +30,27 @@ const HOST = process.env.HOST || '0.0.0.0'; // 외부 접근 허용
 
 // Express 앱 설정
 const app = express();
+
+// 보안 미들웨어
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // OBS Browser Source 호환성
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
+// Rate limiting (API 보호)
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15분
+  max: 100, // 최대 100 요청
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api/', apiLimiter);
+app.use('/webhook/', apiLimiter);
+
 app.use(express.json());
 
 // CORS 설정 (외부 접근 허용)
