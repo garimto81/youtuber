@@ -398,6 +398,23 @@ function handleMessage(message: ServerMessage): void {
 // 초기화
 // ========================================
 
+async function fetchRecentProjects(): Promise<void> {
+  try {
+    const response = await fetch('/api/github/recent-projects');
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    if (data.success && data.projects) {
+      state.projects = data.projects;
+      renderProjects();
+      console.log(`[Overlay] Loaded ${data.projects.length} recent projects`);
+    }
+  } catch (error) {
+    console.error('[Overlay] Failed to fetch recent projects:', error);
+  }
+}
+
 function init(): void {
   console.log('[Overlay] Initializing...');
 
@@ -414,6 +431,12 @@ function init(): void {
   renderHeader();
   renderProjects();
   renderActivities();
+
+  // 최근 프로젝트 자동 로드
+  fetchRecentProjects();
+
+  // 주기적으로 최근 프로젝트 갱신 (5분마다)
+  setInterval(fetchRecentProjects, 5 * 60 * 1000);
 
   console.log('[Overlay] Ready');
 }

@@ -3,6 +3,8 @@ import { createServer } from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import { WebSocketManager } from './websocket.js';
 import { createGitHubWebhookRouter } from './github-webhook.js';
 import { OBSController } from './obs-controller.js';
@@ -10,7 +12,10 @@ import type {
   TDDStatusPayload,
   ActiveProject,
   SessionStatsPayload,
+  CommitPayload,
 } from '@youtuber/shared';
+
+const execAsync = promisify(exec);
 
 // 환경 변수 로드
 dotenv.config();
@@ -274,6 +279,121 @@ app.post('/api/overlay/amount', (req, res) => {
 
   console.log(`[Overlay] Amount updated: ${amount}`);
   res.json({ success: true });
+});
+
+// GitHub API: 최근 활동 프로젝트 조회
+const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'garimto81';
+const RECENT_DAYS = parseInt(process.env.RECENT_DAYS || '5', 10);
+
+interface GitHubEvent {
+  type: string;
+  repo: { name: string };
+  created_at: string;
+  payload?: {
+    commits?: Array<{
+      sha: string;
+      message: string;
+      author: { name: string };
+    }>;
+  };
+}
+
+app.get('/api/github/recent-projects', async (_req, res) => {
+  try {
+    // gh CLI로 최근 이벤트 조회 (Windows 경로 변환 방지를 위해 슬래시 제거)
+    const { stdout } = await execAsync(
+      `gh api "users/${GITHUB_USERNAME}/events" --paginate --jq ".[] | {type: .type, repo: .repo.name, created_at: .created_at, payload: .payload}"`,
+      { maxBuffer: 10 * 1024 * 1024 }
+    );
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - RECENT_DAYS);
+
+    // JSON Lines 파싱
+    const events: GitHubEvent[] = stdout
+      .trim()
+      .split('\n')
+      .filter((line) => line.trim())
+      .map((line): GitHubEvent | null => {
+        try {
+          const parsed = JSON.parse(line);
+          return {
+            type: parsed.type,
+            repo: { name: parsed.repo },
+            created_at: parsed.created_at,
+            payload: parsed.payload,
+          };
+        } catch {
+          return null;
+        }
+      })
+      .filter((e): e is GitHubEvent => e !== null);
+
+    // 최근 RECENT_DAYS일 내 이벤트만 필터링
+    const recentEvents = events.filter(
+      (e) => new Date(e.created_at) >= cutoffDate
+    );
+
+    // 프로젝트별로 그룹화
+    const projectMap = new Map<string, { lastActivity: string; lastCommit?: CommitPayload }>();
+
+    for (const event of recentEvents) {
+      const repoName = event.repo.name.split('/').pop() || event.repo.name;
+      const existing = projectMap.get(repoName);
+
+      if (!existing || new Date(event.created_at) > new Date(existing.lastActivity)) {
+        let lastCommit: CommitPayload | undefined;
+
+        // PushEvent에서 커밋 정보 추출
+        if (event.type === 'PushEvent' && event.payload?.commits?.length) {
+          const commit = event.payload.commits[0];
+          lastCommit = {
+            sha: commit.sha.substring(0, 7),
+            message: commit.message.split('\n')[0].substring(0, 50),
+            author: commit.author.name,
+            repo: repoName,
+            timestamp: event.created_at,
+          };
+        }
+
+        projectMap.set(repoName, {
+          lastActivity: event.created_at,
+          lastCommit: lastCommit || existing?.lastCommit,
+        });
+      }
+    }
+
+    // ActiveProject 배열로 변환
+    const projects: ActiveProject[] = Array.from(projectMap.entries())
+      .map(([name, data], index) => ({
+        name,
+        repo: `${GITHUB_USERNAME}/${name}`,
+        lastActivity: data.lastActivity,
+        lastCommit: data.lastCommit,
+        isActive: index === 0, // 가장 최근 프로젝트가 active
+      }))
+      .sort((a, b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime())
+      .slice(0, 5); // 최대 5개
+
+    // sessionState 업데이트
+    sessionState.activeProjects = projects;
+
+    // WebSocket으로 브로드캐스트
+    wsManager.broadcast('project', {
+      type: 'project:active',
+      payload: { projects },
+      timestamp: new Date().toISOString(),
+    });
+
+    console.log(`[GitHub] Found ${projects.length} recent projects`);
+    res.json({ success: true, projects });
+  } catch (error) {
+    console.error('[GitHub] Error fetching recent projects:', error);
+    res.status(500).json({
+      error: 'Failed to fetch recent projects',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 });
 
 // 서버 시작
