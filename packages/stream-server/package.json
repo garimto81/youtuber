@@ -1,0 +1,28 @@
+{
+  "name": "@youtuber/stream-server",
+  "version": "1.0.0",
+  "description": "YouTube 스트리밍 오버레이 서버",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src/ --ext .ts",
+    "lint:fix": "eslint src/ --ext .ts --fix"
+  },
+  "dependencies": {
+    "@youtuber/shared": "workspace:*",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "obs-websocket-js": "^5.0.6",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.0",
+    "@types/ws": "^8.5.12",
+    "tsx": "^4.15.6",
+    "typescript": "^5.5.0"
+  }
+}

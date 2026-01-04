@@ -8,7 +8,7 @@ import type {
   IssuePayload,
   CIPayload,
   ActivityItem,
-} from '../types/index.js';
+} from '@youtuber/shared';
 
 // GitHub Webhook 이벤트 타입
 interface GitHubPushEvent {

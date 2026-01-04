@@ -11,7 +11,7 @@ import type {
   SubscriptionChannel,
   OverlayConfigPayload,
   OverlayAmountPayload,
-} from '../types/index.js';
+} from '@youtuber/shared';
 
 // ========================================
 // WebSocket 연결 관리

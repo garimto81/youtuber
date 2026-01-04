@@ -1,0 +1,17 @@
+{
+  "name": "@youtuber/overlay",
+  "version": "1.0.0",
+  "description": "OBS Browser Source 오버레이",
+  "type": "module",
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@youtuber/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

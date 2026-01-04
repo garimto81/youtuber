@@ -36,3 +36,5 @@ coverage/
 
 # Claude Code tasks
 tasks/
+archive/
+nul

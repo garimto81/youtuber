@@ -10,7 +10,7 @@ import type {
   TDDStatusPayload,
   ActiveProject,
   SessionStatsPayload,
-} from '../types/index.js';
+} from '@youtuber/shared';
 
 // 환경 변수 로드
 dotenv.config();
@@ -19,15 +19,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
-const HOST = process.env.HOST || 'localhost';
+const HOST = process.env.HOST || '0.0.0.0'; // 외부 접근 허용
 
 // Express 앱 설정
 const app = express();
 app.use(express.json());
 
+// CORS 설정 (외부 접근 허용)
+app.use((_req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+
 // 정적 파일 서빙 (오버레이 HTML/CSS/JS)
-const overlayPath = path.resolve(__dirname, '../overlay');
-app.use('/overlay', express.static(overlayPath));
+// packages/overlay/public (HTML, CSS) + packages/overlay/dist (JS)
+const overlayPublicPath = path.resolve(__dirname, '../../overlay/public');
+const overlayDistPath = path.resolve(__dirname, '../../overlay/dist');
+app.use('/overlay', express.static(overlayPublicPath));
+app.use('/overlay', express.static(overlayDistPath));
 
 // HTTP 서버 생성
 const server = createServer(app);

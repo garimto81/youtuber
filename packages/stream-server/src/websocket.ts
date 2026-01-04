@@ -4,7 +4,7 @@ import type {
   ClientMessage,
   ServerMessage,
   SubscriptionChannel,
-} from '../types/index.js';
+} from '@youtuber/shared';
 
 interface ExtendedWebSocket extends WebSocket {
   subscriptions: Set<SubscriptionChannel>;
