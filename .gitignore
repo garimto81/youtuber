@@ -5,6 +5,8 @@ node_modules/
 dist/
 src/overlay/overlay/
 src/overlay/types/
+src/overlay/app.js
+src/types/*.js
 
 # Environment
 .env
