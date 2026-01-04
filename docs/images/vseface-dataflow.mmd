@@ -1,0 +1,55 @@
+sequenceDiagram
+    participant User as 스트리머
+    participant WebCam as 웹캠
+    participant VSeeFace as VSeeFace<br/>(VMC Protocol)
+    participant VMC as packages/vtuber<br/>VMC Client
+    participant SS as packages/stream-server<br/>Express + WS
+    participant GH as GitHub Webhook
+    participant CB as youtuber_chatbot
+    participant OBS as OBS Overlay<br/>Browser Source
+
+    %% Phase 1: VSeeFace 기본 연동
+    Note over User,VSeeFace: Phase 1: VSeeFace 연결 및 얼굴 추적
+    User->>WebCam: 얼굴 움직임 (고개 끄덕임, 표정)
+    WebCam->>VSeeFace: 얼굴 추적 데이터 (30fps)
+    VSeeFace->>VSeeFace: BlendShape 계산<br/>(Joy, Angry, Sorrow...)
+    VSeeFace->>VMC: VMC UDP 전송<br/>Port 39539<br/>/VMC/Ext/Blend/Val
+    VMC->>SS: WebSocket 연결<br/>vtuber 채널 구독
+    VMC->>SS: 표정 데이터 전송<br/>type: 'vtuber:tracking'
+    SS->>OBS: WebSocket 브로드캐스트<br/>아바타 상태 업데이트
+
+    %% Phase 3: GitHub 이벤트 반응
+    Note over GH,OBS: Phase 3: GitHub 이벤트 → 아바타 반응
+    GH->>SS: POST /webhook/github<br/>Event: push (Commit)
+    SS->>SS: handlePush() 실행<br/>CommitPayload 생성
+    SS->>VMC: 표정 트리거<br/>type: 'vtuber:expression'<br/>payload: {expression: 'happy', duration: 2000}
+    VMC->>VSeeFace: VMC UDP 전송<br/>/VMC/Ext/Blend/Apply<br/>Joy=1.0
+    VSeeFace->>VSeeFace: 아바타 표정 업데이트<br/>(2초간 happy)
+    SS->>OBS: WebSocket 브로드캐스트<br/>반응 아이콘 표시 (🎉)
+    OBS->>OBS: 오버레이 렌더링<br/>아이콘 2초간 표시
+
+    %% Phase 4: 채팅 상호작용
+    Note over CB,OBS: Phase 4: 채팅 감정 분석 → 아바타 반응
+    CB->>SS: POST /api/chat/emotion<br/>{message: "대박!", emotion: "positive"}
+    SS->>SS: mapChatEmotion()<br/>"positive" → "happy"
+    SS->>VMC: 표정 트리거<br/>payload: {expression: 'happy', duration: 2000, trigger: 'chat'}
+    VMC->>VSeeFace: VMC UDP 전송<br/>/VMC/Ext/Blend/Apply<br/>Joy=1.0
+    VSeeFace->>VSeeFace: 아바타 표정 업데이트
+    SS->>OBS: WebSocket 브로드캐스트<br/>채팅 반응 표시 (💬)
+
+    %% Phase 2: OBS 오버레이
+    Note over User,OBS: Phase 2: OBS 오버레이 통합
+    User->>OBS: OBS 실행<br/>Browser Source 추가
+    OBS->>SS: HTTP GET<br/>http://localhost:3001/overlay
+    SS->>OBS: HTML 응답<br/>(Vite 번들)
+    OBS->>OBS: Window Capture 추가<br/>VSeeFace (320x180)
+    OBS->>OBS: 레이아웃 구성<br/>1920x1080
+
+    %% 타이밍 다이어그램
+    Note over GH,OBS: 타이밍: GitHub Commit → 아바타 반응
+    Note right of GH: T=0ms: Commit push
+    Note right of SS: T=100ms: Webhook 수신
+    Note right of VMC: T=200ms: VMC 전송
+    Note right of VSeeFace: T=300ms: 아바타 업데이트
+    Note right of OBS: T=500ms: 오버레이 표시
+    Note over GH,OBS: 총 지연시간: < 1초 ✅

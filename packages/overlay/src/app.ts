@@ -401,8 +401,9 @@ function handleMessage(message: ServerMessage): void {
 function init(): void {
   console.log('[Overlay] Initializing...');
 
-  // WebSocket 연결
-  const wsUrl = `ws://${window.location.hostname}:3001`;
+  // WebSocket 연결 (프로토콜과 호스트 자동 감지)
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${wsProtocol}//${window.location.host}`;
   const ws = new OverlayWebSocket(wsUrl, handleMessage);
   ws.connect();
 

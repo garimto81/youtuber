@@ -1,0 +1,47 @@
+graph TD
+    %% External Components
+    WebCam[웹캠<br/>Face Tracking]
+    VSeeFace[VSeeFace<br/>VMC Protocol v1.13.38+<br/>Port 39539]
+    GitHub[GitHub Webhook<br/>Events: Commit, PR, CI]
+    ChatBot[youtuber_chatbot<br/>Port 3002<br/>Ollama + Qwen 3]
+    OBS[OBS Studio<br/>WebSocket 4.9.1+<br/>Port 4455]
+
+    %% youtuber Packages
+    subgraph YoutuberMonorepo[youtuber Monorepo]
+        VTuberPkg[packages/vtuber<br/>━━━━━━━━━━━━<br/>VMC Client<br/>Avatar Controller<br/>Reaction Mapper]
+
+        StreamServer[packages/stream-server<br/>━━━━━━━━━━━━<br/>Express Port 3001<br/>WebSocket Manager<br/>GitHub Webhook Handler<br/>VTuber Routes]
+
+        Overlay[packages/overlay<br/>━━━━━━━━━━━━<br/>Browser Source<br/>Vite + TypeScript]
+
+        Shared[packages/shared<br/>━━━━━━━━━━━━<br/>Type Definitions<br/>VTuber Types]
+    end
+
+    %% Data Flow
+    WebCam -->|얼굴 추적 데이터| VSeeFace
+    VSeeFace -->|VMC UDP<br/>BlendShapes 30fps| VTuberPkg
+    VTuberPkg -->|표정 제어<br/>Blend Apply| VSeeFace
+    VTuberPkg -->|WebSocket<br/>vtuber:expression| StreamServer
+
+    GitHub -->|POST /webhook/github<br/>HMAC SHA256| StreamServer
+    ChatBot -->|GET /api/chat/analyze<br/>emotion result| StreamServer
+
+    StreamServer -->|WebSocket Broadcast<br/>vtuber channel| Overlay
+    StreamServer -->|OBS WebSocket<br/>Scene Control| OBS
+
+    Overlay -->|Browser Source<br/>http://localhost:3001| OBS
+    VSeeFace -->|Window Capture<br/>320x180| OBS
+
+    %% Shared Types
+    Shared -.->|Import Types| VTuberPkg
+    Shared -.->|Import Types| StreamServer
+    Shared -.->|Import Types| Overlay
+
+    %% Styling
+    classDef external fill:#667eea,stroke:#764ba2,stroke-width:3px,color:#fff
+    classDef package fill:#8957e5,stroke:#58a6ff,stroke-width:2px,color:#fff
+    classDef shared fill:#3fb950,stroke:#1f6feb,stroke-width:2px,color:#fff
+
+    class WebCam,VSeeFace,GitHub,ChatBot,OBS external
+    class VTuberPkg,StreamServer,Overlay package
+    class Shared shared
