@@ -398,6 +398,23 @@ function handleMessage(message: ServerMessage): void {
 // 초기화
 // ========================================
 
+async function fetchOverlayConfig(): Promise<void> {
+  try {
+    const response = await fetch('/api/overlay/config');
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    state.streamTitle = data.title || '오늘의 코딩';
+    state.goalAmount = data.goalAmount || 10000000000;
+    state.currentAmount = data.currentAmount || 0;
+    renderHeader();
+    console.log(`[Overlay] Config loaded: ${state.streamTitle}`);
+  } catch (error) {
+    console.error('[Overlay] Failed to fetch config:', error);
+  }
+}
+
 async function fetchRecentProjects(): Promise<void> {
   try {
     const response = await fetch('/api/github/recent-projects');
@@ -432,7 +449,8 @@ function init(): void {
   renderProjects();
   renderActivities();
 
-  // 최근 프로젝트 자동 로드
+  // 초기 설정 및 프로젝트 로드
+  fetchOverlayConfig();
   fetchRecentProjects();
 
   // 주기적으로 최근 프로젝트 갱신 (5분마다)

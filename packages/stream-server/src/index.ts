@@ -97,6 +97,19 @@ const sessionState: SessionState = {
   activeProjects: [],
 };
 
+// 오버레이 설정 상태
+interface OverlayConfig {
+  title: string;
+  goalAmount: number;
+  currentAmount: number;
+}
+
+const overlayConfig: OverlayConfig = {
+  title: '오늘의 코딩',
+  goalAmount: 10000000000,
+  currentAmount: 0,
+};
+
 // API 엔드포인트
 
 // 헬스 체크
@@ -269,32 +282,48 @@ app.get('/api/obs/status', async (_req, res) => {
   });
 });
 
+// 오버레이 설정 조회
+app.get('/api/overlay/config', (_req, res) => {
+  res.json({
+    title: overlayConfig.title,
+    goalAmount: overlayConfig.goalAmount,
+    currentAmount: overlayConfig.currentAmount,
+  });
+});
+
 // 오버레이 설정 업데이트
 app.post('/api/overlay/config', (req, res) => {
   const { title, goalAmount } = req.body;
 
+  // 상태 저장
+  if (title !== undefined) overlayConfig.title = title;
+  if (goalAmount !== undefined) overlayConfig.goalAmount = goalAmount;
+
   wsManager.broadcastAll({
     type: 'overlay:config',
-    payload: { title, goalAmount },
+    payload: { title: overlayConfig.title, goalAmount: overlayConfig.goalAmount },
     timestamp: new Date().toISOString(),
   });
 
-  console.log(`[Overlay] Config updated: ${title || 'no title'}, goal: ${goalAmount || 'no change'}`);
-  res.json({ success: true });
+  console.log(`[Overlay] Config updated: ${overlayConfig.title}, goal: ${overlayConfig.goalAmount}`);
+  res.json({ success: true, config: overlayConfig });
 });
 
 // 오버레이 금액 업데이트
 app.post('/api/overlay/amount', (req, res) => {
   const { amount } = req.body;
 
+  // 상태 저장
+  overlayConfig.currentAmount = amount;
+
   wsManager.broadcastAll({
     type: 'overlay:amount',
-    payload: { amount },
+    payload: { amount: overlayConfig.currentAmount },
     timestamp: new Date().toISOString(),
   });
 
-  console.log(`[Overlay] Amount updated: ${amount}`);
-  res.json({ success: true });
+  console.log(`[Overlay] Amount updated: ${overlayConfig.currentAmount}`);
+  res.json({ success: true, currentAmount: overlayConfig.currentAmount });
 });
 
 // GitHub API: 최근 활동 프로젝트 조회
