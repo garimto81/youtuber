@@ -24,6 +24,22 @@ Railway가 자동으로 `railway.toml`을 감지합니다.
 
 배포 URL 예시: `https://youtuber-production-xxxx.up.railway.app`
 
+### 배포 버전 확인
+
+오버레이 상단 제목에 자동으로 **버전**과 **커밋 해시**가 표시됩니다:
+
+```
+AI Coding v2.1.0 (4ec3610)
+           ↑        ↑
+         버전    커밋해시
+```
+
+API로 확인:
+```bash
+curl https://your-app.up.railway.app/api/overlay/config
+# {"title":"AI Coding v2.1.0 (4ec3610)","goalAmount":...}
+```
+
 ### 테스트
 
 ```bash
@@ -44,13 +60,20 @@ https://your-app.up.railway.app/overlay/
 
 ## 5. 오버레이 설정 API
 
-### 제목 설정
+### 기본 제목
+
+배포 시 기본 제목은 자동으로 설정됩니다:
+- 형식: `AI Coding v{version} ({commit_hash})`
+- 버전: `package.json`에서 읽음
+- 커밋 해시: Railway의 `RAILWAY_GIT_COMMIT_SHA` 환경 변수 사용
+
+### 제목 커스터마이징
 
 ```bash
-# 제목 및 목표 금액 설정
+# 제목 및 목표 금액 설정 (선택사항)
 curl -X POST https://your-app.up.railway.app/api/overlay/config \
   -H "Content-Type: application/json" \
-  -d '{"title": "오늘의 코딩", "goalAmount": 10000000000}'
+  -d '{"title": "커스텀 제목", "goalAmount": 10000000000}'
 
 # 현재 설정 조회
 curl https://your-app.up.railway.app/api/overlay/config
