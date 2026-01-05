@@ -70,7 +70,12 @@ const envSchema = z.object({
   YOUTUBE_CHANNEL_ID: z
     .string()
     .optional()
-    .describe('YouTube 채널 ID'),
+    .describe('YouTube 채널 ID (라이브 검색용)'),
+
+  YOUTUBE_VIDEO_ID: z
+    .string()
+    .optional()
+    .describe('YouTube 비디오/라이브 ID (직접 지정)'),
 });
 
 /**
@@ -91,6 +96,7 @@ function parseEnv() {
       GITHUB_USERNAME: process.env.GITHUB_USERNAME,
       YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY,
       YOUTUBE_CHANNEL_ID: process.env.YOUTUBE_CHANNEL_ID,
+      YOUTUBE_VIDEO_ID: process.env.YOUTUBE_VIDEO_ID,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
