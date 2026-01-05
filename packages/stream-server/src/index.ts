@@ -11,6 +11,7 @@ import { config } from './config.js';
 import { WebSocketManager } from './websocket.js';
 import { createGitHubWebhookRouter } from './github-webhook.js';
 import { OBSController } from './obs-controller.js';
+import { getCurrentLiveStream, getLiveStreamTitle } from './youtube-client.js';
 import type {
   TDDStatusPayload,
   ActiveProject,
@@ -161,11 +162,18 @@ app.get('/health', (_req, res) => {
 });
 
 // 세션 시작
-app.post('/api/session/start', (_req, res) => {
+app.post('/api/session/start', async (_req, res) => {
   sessionState.startTime = new Date();
   sessionState.commits = 0;
   sessionState.testsRun = 0;
   sessionState.issuesClosed = 0;
+
+  // YouTube 라이브 제목 자동 동기화 시도
+  const youtubeTitle = await getLiveStreamTitle();
+  if (youtubeTitle) {
+    overlayConfig.title = youtubeTitle;
+    console.log(`[Session] YouTube title synced: ${youtubeTitle}`);
+  }
 
   wsManager.broadcastAll({
     type: 'session:start',
@@ -173,8 +181,15 @@ app.post('/api/session/start', (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 
+  // 제목 업데이트도 브로드캐스트
+  wsManager.broadcastAll({
+    type: 'overlay:config',
+    payload: { title: overlayConfig.title, goalAmount: overlayConfig.goalAmount },
+    timestamp: new Date().toISOString(),
+  });
+
   console.log('[Session] Started');
-  res.json({ success: true, startTime: sessionState.startTime });
+  res.json({ success: true, startTime: sessionState.startTime, title: overlayConfig.title });
 });
 
 // 세션 종료
@@ -355,6 +370,40 @@ app.post('/api/overlay/amount', (req, res) => {
 
   console.log(`[Overlay] Amount updated: ${overlayConfig.currentAmount}`);
   res.json({ success: true, currentAmount: overlayConfig.currentAmount });
+});
+
+// YouTube 라이브 스트림 정보 조회
+app.get('/api/youtube/live', async (_req, res) => {
+  const liveStream = await getCurrentLiveStream();
+
+  if (!liveStream) {
+    res.json({ success: false, message: 'No live stream found or YouTube API not configured' });
+    return;
+  }
+
+  res.json({ success: true, liveStream });
+});
+
+// YouTube 라이브 제목으로 오버레이 제목 동기화
+app.post('/api/overlay/sync-youtube', async (_req, res) => {
+  const title = await getLiveStreamTitle();
+
+  if (!title) {
+    res.json({ success: false, message: 'No live stream found or YouTube API not configured' });
+    return;
+  }
+
+  // 오버레이 제목 업데이트
+  overlayConfig.title = title;
+
+  wsManager.broadcastAll({
+    type: 'overlay:config',
+    payload: { title: overlayConfig.title, goalAmount: overlayConfig.goalAmount },
+    timestamp: new Date().toISOString(),
+  });
+
+  console.log(`[Overlay] Title synced from YouTube: ${title}`);
+  res.json({ success: true, title });
 });
 
 // GitHub API: 최근 활동 프로젝트 조회
