@@ -132,6 +132,8 @@ overlay        →  shared (타입 사용)
 | `/api/project/active` | POST | 활성 프로젝트 목록 |
 | `/api/obs/scene` | POST | OBS Scene 전환 |
 | `/api/obs/status` | GET | OBS 상태 확인 |
+| `/api/overlay/config` | GET/POST | 오버레이 제목/목표금액 설정 |
+| `/api/overlay/amount` | POST | 현재 금액 업데이트 |
 | `/webhook/github` | POST | GitHub Webhook |
 
 ## 환경 변수
@@ -205,9 +207,35 @@ pnpm lint
 pnpm lint:fix
 ```
 
+## 배포
+
+### Railway (클라우드)
+
+```bash
+# 1. Railway CLI 로그인
+railway login
+
+# 2. 프로젝트 연결
+railway link
+
+# 3. 배포
+railway up
+```
+
+**Railway 배포 가이드**: [docs/DEPLOY.md](docs/DEPLOY.md)
+
+### Docker (로컬)
+
+```bash
+docker-compose up -d
+```
+
+**Docker 배포 가이드**: [docs/DOCKER_GUIDE.md](docs/DOCKER_GUIDE.md)
+
 ## 문서
 
 - `CLAUDE.md` - Claude Code를 위한 개발 가이드
+- `docs/DEPLOY.md` - Railway 배포 가이드
 - `docs/DOCKER_GUIDE.md` - Docker 배포 가이드
 - `docs/DEPLOYMENT_IMPROVEMENT_PROPOSAL.md` - 배포 개선 제안서
 - `docs/PRD-0001-stream-system.md` - 스트림 시스템 PRD (v5 레이아웃)

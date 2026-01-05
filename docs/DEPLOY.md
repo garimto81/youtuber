@@ -42,6 +42,30 @@ https://your-app.up.railway.app/overlay/
 4. Content type: `application/json`
 5. Events: Push, Pull requests, Issues
 
-## 5. 커스텀 도메인 (선택)
+## 5. 오버레이 설정 API
+
+### 제목 설정
+
+```bash
+# 제목 및 목표 금액 설정
+curl -X POST https://your-app.up.railway.app/api/overlay/config \
+  -H "Content-Type: application/json" \
+  -d '{"title": "오늘의 코딩", "goalAmount": 10000000000}'
+
+# 현재 설정 조회
+curl https://your-app.up.railway.app/api/overlay/config
+```
+
+### 금액 업데이트
+
+```bash
+curl -X POST https://your-app.up.railway.app/api/overlay/amount \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 1000000}'
+```
+
+WebSocket `overlay:config` 및 `overlay:amount` 메시지로 실시간 반영됩니다.
+
+## 6. 커스텀 도메인 (선택)
 
 Railway Dashboard > Settings > Domains에서 커스텀 도메인 설정 가능

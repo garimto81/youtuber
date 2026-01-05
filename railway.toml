@@ -11,7 +11,7 @@ cmds = ["pnpm install"]
 cmds = ["pnpm build"]
 
 [deploy]
-startCommand = "node packages/stream-server/dist/index.js"
+startCommand = "node packages/stream-server/dist/server.js"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
