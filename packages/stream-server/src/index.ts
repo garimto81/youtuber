@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -21,6 +22,36 @@ const execAsync = promisify(exec);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// 버전 정보 로드
+function getVersionInfo(): { version: string; commitHash: string } {
+  let version = '0.0.0';
+  let commitHash = process.env.COMMIT_HASH || 'unknown';
+
+  // package.json 경로 후보 (빌드 환경에 따라 다름)
+  const pkgPaths = [
+    path.resolve(__dirname, '../../../package.json'), // Docker: /app/packages/stream-server/dist -> /app
+    path.resolve(__dirname, '../../package.json'),    // 로컬 개발
+  ];
+
+  for (const pkgPath of pkgPaths) {
+    try {
+      if (fs.existsSync(pkgPath)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+        if (pkg.version) {
+          version = pkg.version;
+          break;
+        }
+      }
+    } catch {
+      // 다음 경로 시도
+    }
+  }
+
+  return { version, commitHash };
+}
+
+const versionInfo = getVersionInfo();
 
 // Express 앱 설정
 const app = express();
@@ -105,7 +136,7 @@ interface OverlayConfig {
 }
 
 const overlayConfig: OverlayConfig = {
-  title: '오늘의 코딩',
+  title: `AI Coding v${versionInfo.version} (${versionInfo.commitHash.slice(0, 7)})`,
   goalAmount: 10000000000,
   currentAmount: 0,
 };

@@ -60,11 +60,17 @@ COPY --from=builder --chown=nodejs:nodejs /app/packages/overlay/dist ./packages/
 COPY --chown=nodejs:nodejs packages/overlay/public ./packages/overlay/public
 
 # shared 패키지는 번들에 포함되어 있으므로 복사 불필요
+# 참고: 루트 package.json은 이미 복사됨 (pnpm install용)
+
+# 빌드 인자 (Railway에서 자동 제공)
+ARG RAILWAY_GIT_COMMIT_SHA
+ARG COMMIT_HASH=${RAILWAY_GIT_COMMIT_SHA:-unknown}
 
 # 환경 변수 설정
 ENV NODE_ENV=production
 ENV PORT=3001
 ENV HOST=0.0.0.0
+ENV COMMIT_HASH=${COMMIT_HASH}
 
 # 헬스체크 설정
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
