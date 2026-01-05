@@ -1,9 +1,10 @@
 # PRD-0001: AI Coding YouTube 방송 시스템
 
-**버전**: 1.6.0
-**작성일**: 2026-01-04
-**상태**: Draft
+**버전**: 1.7.0
+**작성일**: 2026-01-05
+**상태**: Active
 **프로젝트**: `D:\AI\claude01\youtuber`
+**배포 URL**: https://stream-server-production-bb36.up.railway.app
 
 ---
 
@@ -504,32 +505,59 @@ interface ServerMessage {
 }
 ```
 
-### 7.4 YouTube API 연동 (예정)
+### 7.4 YouTube API 연동 (구현 완료)
 
-**YouTube Live Streaming API:**
-- 엔드포인트: `https://www.googleapis.com/youtube/v3/liveBroadcasts`
-- 인증: OAuth 2.0
-- 스코프: `https://www.googleapis.com/auth/youtube.readonly`
+**YouTube Data API v3:**
+- 엔드포인트: `https://www.googleapis.com/youtube/v3/videos`
+- 인증: API Key (OAuth 불필요)
 
-**구현 예정:**
+**구현 완료:**
 
 ```typescript
-// GET /api/youtube/title - 현재 방송 제목 조회
-interface YouTubeTitleResponse {
-  title: string;
-  isLive: boolean;
-  viewerCount?: number;
+// GET /api/youtube/live - 현재 라이브 정보 조회
+interface YouTubeLiveResponse {
+  success: boolean;
+  liveStream?: {
+    title: string;
+    videoId: string;
+    channelId: string;
+    publishedAt: string;
+  };
 }
 
-// 폴링 주기: 5분
-// 폴백: API 실패 시 기본값 "AI 코딩 방송"
+// POST /api/overlay/sync-youtube - YouTube 제목으로 동기화
+// 세션 시작 시 자동 동기화됨
 ```
+
+**조회 우선순위:**
+1. `YOUTUBE_VIDEO_ID` 설정 시 → 해당 비디오 직접 조회
+2. `YOUTUBE_CHANNEL_ID` 설정 시 → 채널의 라이브 스트림 검색
 
 **환경 변수:**
 
 ```env
 YOUTUBE_API_KEY=your_api_key
-YOUTUBE_CHANNEL_ID=your_channel_id
+YOUTUBE_VIDEO_ID=5qVedg3BJqw      # 직접 지정 (우선순위 높음)
+YOUTUBE_CHANNEL_ID=your_channel_id  # 라이브 검색용
+```
+
+### 7.5 버전/커밋 해시 표시 (구현 완료)
+
+**기본 제목 형식:**
+```
+AI Coding v{version} ({commit_hash})
+예: AI Coding v2.1.0 (95f2870)
+```
+
+**동작 방식:**
+- 버전: `package.json`에서 런타임 로드
+- 커밋 해시: `COMMIT_HASH` 환경 변수 (Railway: `RAILWAY_GIT_COMMIT_SHA`)
+- 배포 시 자동 업데이트
+
+**확인 방법:**
+```bash
+curl https://stream-server-production-bb36.up.railway.app/api/overlay/config
+# {"title":"AI Coding v2.1.0 (95f2870)","goalAmount":...}
 ```
 
 ---
@@ -538,6 +566,7 @@ YOUTUBE_CHANNEL_ID=your_channel_id
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|----------|--------|
+| 1.7.0 | 2026-01-05 | Railway 배포, YouTube API 구현, 버전/해시 자동 표시, Issue #10 완료 | Claude Code |
 | 1.6.0 | 2026-01-04 | v5 상단헤더+축소하단: 40px 헤더(제목/타이머/금액), 100px 2줄카드, YouTube API 연동 | Claude Code |
 | 1.5.0 | 2026-01-03 | v4 멀티프로젝트: 하단 180px 활동카드, 우측 커밋귀속, LIVE 제거 | Claude Code |
 | 1.4.0 | 2026-01-03 | FR 상세화: #1 실시간피드 스크롤, #2 활성프로젝트 GitHub API | Claude Code |
@@ -545,6 +574,30 @@ YOUTUBE_CHANNEL_ID=your_channel_id
 | 1.2.0 | 2026-01-03 | 우측 패널: 이슈 중심 진행 단계, 하단 바: 세션 타임라인 | Claude Code |
 | 1.1.0 | 2026-01-03 | 레이아웃 전면 수정 (옵션 A: 우측 패널형, 16:9 준수) | Claude Code |
 | 1.0.0 | 2026-01-03 | 초안 작성 | Claude Code |
+
+### v1.7.0 상세 변경 내용 (2026-01-05)
+
+**Railway 배포:**
+- Dockerfile pnpm 8 → 10 업그레이드 (lockfile 호환성)
+- tsconfig*.json 전체 복사
+- OBS/Webhook 비밀번호 선택사항으로 변경
+- 배포 URL: https://stream-server-production-bb36.up.railway.app
+
+**YouTube API 연동:**
+- YouTube Data API v3 클라이언트 구현
+- `GET /api/youtube/live` - 라이브 정보 조회
+- `POST /api/overlay/sync-youtube` - 제목 수동 동기화
+- 세션 시작 시 자동 제목 동기화
+- VIDEO_ID 직접 지정 지원 (채널 검색보다 우선)
+
+**버전/해시 자동 표시:**
+- 기본 제목: `AI Coding v{version} ({commit_hash})`
+- package.json에서 버전 로드
+- RAILWAY_GIT_COMMIT_SHA로 커밋 해시 표시
+- 배포 버전 즉시 확인 가능
+
+**해결된 이슈:**
+- Issue #10: 상단 제목 연동 (Closed)
 
 ---
 
