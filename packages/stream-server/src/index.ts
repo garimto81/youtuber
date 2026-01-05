@@ -6,7 +6,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { config, isProduction } from './config.js';
+import { config } from './config.js';
 import { WebSocketManager } from './websocket.js';
 import { createGitHubWebhookRouter } from './github-webhook.js';
 import { OBSController } from './obs-controller.js';
