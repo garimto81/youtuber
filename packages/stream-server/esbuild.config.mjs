@@ -45,17 +45,11 @@ async function bundle() {
       // 로그
       logLevel: 'info',
 
-      // 배너 (ESM import 호환성)
+      // 배너: require() 지원 (ESM에서 CommonJS 모듈 로드용)
+      // 참고: __filename/__dirname은 소스 코드에서 이미 정의
       banner: {
-        js: `
-import { createRequire } from 'module';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const require = createRequire(import.meta.url);
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-`.trim(),
+        js: `import { createRequire as _createRequire } from 'module';
+const require = _createRequire(import.meta.url);`,
       },
     });
 
