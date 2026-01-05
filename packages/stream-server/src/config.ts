@@ -45,14 +45,16 @@ const envSchema = z.object({
 
   OBS_WS_PASSWORD: z
     .string()
-    .min(1, 'OBS WebSocket 비밀번호는 필수입니다')
-    .describe('OBS WebSocket 비밀번호'),
+    .optional()
+    .default('')
+    .describe('OBS WebSocket 비밀번호 (로컬 OBS 연동 시 필요)'),
 
   // GitHub 설정
   GITHUB_WEBHOOK_SECRET: z
     .string()
-    .min(1, 'GitHub Webhook 비밀키는 필수입니다')
-    .describe('GitHub Webhook 검증용 비밀키'),
+    .optional()
+    .default('')
+    .describe('GitHub Webhook 검증용 비밀키 (Webhook 사용 시 필요)'),
 
   GITHUB_USERNAME: z
     .string()
