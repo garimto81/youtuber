@@ -52,13 +52,14 @@ COPY --chown=nodejs:nodejs packages/stream-server/package.json ./packages/stream
 # 프로덕션 의존성만 설치
 RUN pnpm install --prod --frozen-lockfile
 
-# 빌드 결과물 복사
-COPY --from=builder --chown=nodejs:nodejs /app/packages/shared/dist ./packages/shared/dist
-COPY --from=builder --chown=nodejs:nodejs /app/packages/stream-server/dist ./packages/stream-server/dist
+# 빌드 결과물 복사 (번들된 파일만)
+COPY --from=builder --chown=nodejs:nodejs /app/packages/stream-server/dist/server.js ./packages/stream-server/dist/
 COPY --from=builder --chown=nodejs:nodejs /app/packages/overlay/dist ./packages/overlay/dist
 
 # 오버레이 정적 파일 복사 (public 폴더)
 COPY --chown=nodejs:nodejs packages/overlay/public ./packages/overlay/public
+
+# shared 패키지는 번들에 포함되어 있으므로 복사 불필요
 
 # 환경 변수 설정
 ENV NODE_ENV=production

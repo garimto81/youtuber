@@ -6,8 +6,10 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "build": "node esbuild.config.mjs",
+    "build:tsc": "tsc",
+    "build:analyze": "ANALYZE=1 node esbuild.config.mjs",
+    "start": "node dist/server.js",
     "lint": "eslint src/ --ext .ts",
     "lint:fix": "eslint src/ --ext .ts --fix"
   },
@@ -25,6 +27,7 @@
     "@types/express-rate-limit": "^6.0.2",
     "@types/node": "^20.14.0",
     "@types/ws": "^8.5.12",
+    "esbuild": "^0.27.2",
     "tsx": "^4.15.6",
     "typescript": "^5.5.0"
   }
