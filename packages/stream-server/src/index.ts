@@ -2,11 +2,11 @@ import express from 'express';
 import { createServer } from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { config, isProduction } from './config.js';
 import { WebSocketManager } from './websocket.js';
 import { createGitHubWebhookRouter } from './github-webhook.js';
 import { OBSController } from './obs-controller.js';
@@ -19,14 +19,8 @@ import type {
 
 const execAsync = promisify(exec);
 
-// 환경 변수 로드
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const PORT = parseInt(process.env.PORT || '3001', 10);
-const HOST = process.env.HOST || '0.0.0.0'; // 외부 접근 허용
 
 // Express 앱 설정
 const app = express();
@@ -76,14 +70,13 @@ const wsManager = new WebSocketManager(server);
 
 // OBS 컨트롤러
 const obsController = new OBSController(
-  process.env.OBS_WS_HOST || 'localhost',
-  parseInt(process.env.OBS_WS_PORT || '4455', 10),
-  process.env.OBS_WS_PASSWORD
+  config.OBS_WS_HOST,
+  config.OBS_WS_PORT,
+  config.OBS_WS_PASSWORD
 );
 
 // GitHub Webhook 라우터
-const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
-app.use('/webhook', createGitHubWebhookRouter(wsManager, webhookSecret));
+app.use('/webhook', createGitHubWebhookRouter(wsManager, config.GITHUB_WEBHOOK_SECRET));
 
 // 세션 상태 관리
 interface SessionState {
@@ -420,10 +413,11 @@ app.get('/api/github/recent-projects', async (_req, res) => {
 });
 
 // 서버 시작
-server.listen(PORT, HOST, async () => {
-  console.log(`[Server] Running at http://${HOST}:${PORT}`);
-  console.log(`[Server] Overlay available at http://${HOST}:${PORT}/overlay/`);
-  console.log(`[Server] WebSocket at ws://${HOST}:${PORT}`);
+server.listen(config.PORT, config.HOST, async () => {
+  console.log(`[Server] Running at http://${config.HOST}:${config.PORT}`);
+  console.log(`[Server] Overlay available at http://${config.HOST}:${config.PORT}/overlay/`);
+  console.log(`[Server] WebSocket at ws://${config.HOST}:${config.PORT}`);
+  console.log(`[Server] Environment: ${config.NODE_ENV}`);
 
   // OBS 연결 시도
   const obsConnected = await obsController.connect();
