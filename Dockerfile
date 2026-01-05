@@ -19,7 +19,7 @@ RUN pnpm install --frozen-lockfile
 
 # 소스 코드 복사
 COPY packages/ ./packages/
-COPY tsconfig.json ./
+COPY tsconfig*.json ./
 
 # 빌드 실행
 RUN pnpm build
