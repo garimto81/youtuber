@@ -93,12 +93,19 @@ function parseEnv() {
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('❌ 환경 변수 검증 실패:');
-      error.errors.forEach((err) => {
-        const field = err.path.join('.');
-        const message = err.message;
-        console.error(`  - ${field}: ${message}`);
-      });
+      if (error.errors && Array.isArray(error.errors)) {
+        error.errors.forEach((err) => {
+          const field = err.path.join('.');
+          const message = err.message;
+          console.error(`  - ${field}: ${message}`);
+        });
+      }
       console.error('\n💡 .env 파일을 확인하거나 .env.example을 참고하세요.');
+
+      // 테스트 환경에서는 에러를 throw하고, 프로덕션에서는 process.exit
+      if (process.env.NODE_ENV === 'test') {
+        throw error;
+      }
       process.exit(1);
     }
     throw error;
