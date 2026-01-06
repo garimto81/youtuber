@@ -155,12 +155,25 @@ function renderProjects(): void {
     .join('');
 }
 
+function getActivityTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    commit: 'Commit',
+    pr: 'Pull Request',
+    issue: 'Issue',
+    ci: 'CI/CD',
+    prd: 'PRD',
+  };
+  return labels[type] || type.toUpperCase();
+}
+
 function renderActivities(): void {
   if (state.activities.length === 0) {
     activityFeedEl.innerHTML = `
       <div class="activity-card placeholder">
         <div class="activity-repo">세션 대기</div>
-        <div class="activity-summary">⏳ 커밋, PR, 이슈 활동이 표시됩니다</div>
+        <div class="activity-type">WAITING</div>
+        <div class="activity-summary">커밋, PR, 이슈 활동이 표시됩니다</div>
+        <div class="activity-time">--:--</div>
       </div>
     `;
     return;
@@ -172,7 +185,9 @@ function renderActivities(): void {
       (activity) => `
       <div class="activity-card ${getActivityClass(activity.type)}">
         <div class="activity-repo">${activity.repo}</div>
-        <div class="activity-summary">${activity.icon} ${activity.content}</div>
+        <div class="activity-type">${activity.icon} ${getActivityTypeLabel(activity.type)}</div>
+        <div class="activity-summary">${activity.content}</div>
+        <div class="activity-time">${formatRelativeTime(activity.timestamp)}</div>
       </div>
     `
     )
