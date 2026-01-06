@@ -142,6 +142,65 @@ const overlayConfig: OverlayConfig = {
   currentAmount: 0,
 };
 
+// YouTube 제목 동기화 인터벌 (5분)
+const YOUTUBE_SYNC_INTERVAL = 5 * 60 * 1000;
+let youtubeSyncTimer: NodeJS.Timeout | null = null;
+
+/**
+ * YouTube 라이브 제목을 주기적으로 동기화
+ */
+async function syncYouTubeTitle(): Promise<boolean> {
+  const title = await getLiveStreamTitle();
+
+  if (!title) {
+    return false;
+  }
+
+  // 제목이 변경된 경우에만 업데이트
+  if (title !== overlayConfig.title) {
+    overlayConfig.title = title;
+
+    wsManager.broadcastAll({
+      type: 'overlay:config',
+      payload: { title: overlayConfig.title, goalAmount: overlayConfig.goalAmount },
+      timestamp: new Date().toISOString(),
+    });
+
+    console.log(`[YouTube] Title synced: ${title}`);
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * YouTube 제목 동기화 타이머 시작
+ */
+function startYouTubeSyncTimer(): void {
+  if (youtubeSyncTimer) {
+    clearInterval(youtubeSyncTimer);
+  }
+
+  youtubeSyncTimer = setInterval(async () => {
+    if (sessionState.startTime) {
+      await syncYouTubeTitle();
+    }
+  }, YOUTUBE_SYNC_INTERVAL);
+
+  console.log(`[YouTube] Sync timer started (interval: ${YOUTUBE_SYNC_INTERVAL / 1000}s)`);
+}
+
+/**
+ * YouTube 제목 동기화 타이머 정지
+ */
+function stopYouTubeSyncTimer(): void {
+  if (youtubeSyncTimer) {
+    clearInterval(youtubeSyncTimer);
+    youtubeSyncTimer = null;
+    console.log('[YouTube] Sync timer stopped');
+  }
+}
+
 // API 엔드포인트
 
 // 헬스 체크
@@ -169,11 +228,10 @@ app.post('/api/session/start', async (_req, res) => {
   sessionState.issuesClosed = 0;
 
   // YouTube 라이브 제목 자동 동기화 시도
-  const youtubeTitle = await getLiveStreamTitle();
-  if (youtubeTitle) {
-    overlayConfig.title = youtubeTitle;
-    console.log(`[Session] YouTube title synced: ${youtubeTitle}`);
-  }
+  await syncYouTubeTitle();
+
+  // YouTube 제목 주기적 동기화 시작
+  startYouTubeSyncTimer();
 
   wsManager.broadcastAll({
     type: 'session:start',
@@ -198,6 +256,9 @@ app.post('/api/session/end', (_req, res) => {
     res.status(400).json({ error: 'No active session' });
     return;
   }
+
+  // YouTube 제목 동기화 타이머 정지
+  stopYouTubeSyncTimer();
 
   const stats: SessionStatsPayload = {
     startTime: sessionState.startTime.toISOString(),
@@ -538,6 +599,7 @@ server.listen(config.PORT, config.HOST, async () => {
 // 종료 처리
 process.on('SIGINT', async () => {
   console.log('\n[Server] Shutting down...');
+  stopYouTubeSyncTimer();
   await obsController.disconnect();
   wsManager.close();
   server.close();
@@ -546,6 +608,7 @@ process.on('SIGINT', async () => {
 
 process.on('SIGTERM', async () => {
   console.log('\n[Server] Received SIGTERM...');
+  stopYouTubeSyncTimer();
   await obsController.disconnect();
   wsManager.close();
   server.close();
