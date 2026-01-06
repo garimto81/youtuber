@@ -74,6 +74,7 @@ youtuber/
 | `packages/stream-server/src/websocket.ts` | WebSocketManager - 채널 기반 pub/sub |
 | `packages/stream-server/src/github-webhook.ts` | GitHub Webhook 처리 |
 | `packages/stream-server/src/obs-controller.ts` | OBS WebSocket 제어 |
+| `packages/stream-server/src/youtube-client.ts` | YouTube Data API v3 클라이언트 |
 | `packages/overlay/src/app.ts` | OBS Browser Source 프론트엔드 |
 | `packages/shared/src/types/index.ts` | 모든 공유 타입 정의 |
 
@@ -129,7 +130,47 @@ OBS_WS_PORT=4455
 OBS_WS_PASSWORD=your_password
 GITHUB_WEBHOOK_SECRET=secret
 GITHUB_USERNAME=garimto81
+
+# YouTube 제목 동기화 (권장)
+YOUTUBE_API_KEY=your_api_key
+YOUTUBE_CHANNEL_ID=UC...  # 채널 ID (라이브 자동 검색)
 ```
+
+## YouTube 라이브 제목 동기화
+
+채널에서 현재 진행 중인 라이브를 자동으로 찾아 오버레이 제목에 반영합니다.
+
+### 설정 방법
+
+1. **Google Cloud Console**에서 YouTube Data API v3 활성화
+2. **API 키 발급** 후 `.env`에 `YOUTUBE_API_KEY` 설정
+3. **채널 ID** 확인 후 `YOUTUBE_CHANNEL_ID` 설정
+
+```
+채널 URL: https://www.youtube.com/channel/UC9WM0_WZyDC7e8y-vfR99tw
+                                         └────────────────────────┘
+                                         이 부분이 CHANNEL_ID
+```
+
+### 동작 방식
+
+```
+세션 시작 ──▶ YouTube API 호출 ──▶ 현재 라이브 제목 조회
+                                          │
+              ┌───────────────────────────┘
+              ▼
+         오버레이 제목 업데이트 (WebSocket)
+              │
+              ▼ (5분마다 반복)
+         제목 변경 확인 ──▶ 변경 시에만 브로드캐스트
+```
+
+### API 엔드포인트
+
+| 경로 | 메서드 | 용도 |
+|------|--------|------|
+| `/api/youtube/live` | GET | 현재 라이브 스트림 정보 조회 |
+| `/api/overlay/sync-youtube` | POST | 수동으로 YouTube 제목 동기화 |
 
 ## 오버레이 접근
 
